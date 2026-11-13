@@ -1,5 +1,5 @@
 extends SceneTree
-## Built-in headless foundation smoke test; no third-party test addon required.
+## Built-in headless smoke test for project foundation and character data.
 
 var failures: int = 0
 
@@ -9,6 +9,18 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	_test_foundation()
+	_test_character_framework()
+
+	if failures == 0:
+		print("RIFT RUNNERS smoke test: PASS")
+		quit(0)
+	else:
+		push_error("Smoke test: %d failure(s)" % failures)
+		quit(1)
+
+
+func _test_foundation() -> void:
 	_check(ResourceLoader.exists("res://game/scenes/bootstrap.tscn", "PackedScene"), "bootstrap scene exists")
 	_check(root.has_node("EventBus"), "EventBus autoload exists")
 	_check(root.has_node("GameState"), "GameState autoload exists")
@@ -41,12 +53,42 @@ func _run() -> void:
 		var loaded: Dictionary = save_service.call("load_game")
 		_check(loaded.get("rr001_smoke", false) == true, "SaveService reads local data")
 
-	if failures == 0:
-		print("RR-001 smoke test: PASS")
-		quit(0)
-	else:
-		push_error("RR-001 smoke test: %d failure(s)" % failures)
-		quit(1)
+
+func _test_character_framework() -> void:
+	var roster: CharacterRoster = load("res://game/resources/characters/hero_roster.tres") as CharacterRoster
+	_check(roster != null, "hero roster resource loads")
+	if roster == null:
+		return
+
+	var roster_errors: PackedStringArray = roster.validate()
+	_check(roster_errors.is_empty(), "hero roster validates")
+	_check(roster.characters.size() == 3, "roster contains three heroes")
+
+	for hero_id: StringName in [&"vanguard", &"phantom", &"cipher"]:
+		var hero: CharacterDefinition = roster.get_character(hero_id)
+		_check(hero != null, "hero lookup resolves %s" % String(hero_id))
+		if hero != null:
+			_check(hero.validate().is_empty(), "%s definition validates" % String(hero_id))
+			_check(hero.abilities.size() == 1, "%s has one signature ability metadata record" % String(hero_id))
+
+	_check(roster.get_character(&"unknown_hero") == null, "unknown hero lookup returns null")
+
+	var actor_scene: PackedScene = load("res://game/scenes/characters/character_actor.tscn") as PackedScene
+	_check(actor_scene != null, "character actor scene loads")
+	if actor_scene == null:
+		return
+	var actor: CharacterActor = actor_scene.instantiate() as CharacterActor
+	_check(actor != null, "character actor scene instantiates")
+	if actor == null:
+		return
+
+	var vanguard: CharacterDefinition = roster.get_character(&"vanguard")
+	_check(actor.assign_definition(vanguard) == OK, "actor accepts a valid character definition")
+	_check(actor.definition == vanguard, "actor retains its assigned definition")
+	_check(actor.assign_definition(null) == ERR_INVALID_PARAMETER, "actor rejects a null definition")
+	var invalid_definition := CharacterDefinition.new()
+	_check(actor.assign_definition(invalid_definition) == ERR_INVALID_DATA, "actor rejects an invalid definition")
+	actor.free()
 
 
 func _check(condition: bool, description: String) -> void:

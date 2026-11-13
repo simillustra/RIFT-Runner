@@ -5,7 +5,7 @@ RIFT RUNNERS is a mobile-first third-person 3D action-survival runner. Read the 
 
 ## Mandatory rules
 1. Every task references a backlog ID (RR-###) and satisfies its acceptance criteria.
-2. Do not implement gameplay features until RR-001 is accepted.
+2. RR-001 Project Foundation is accepted and merged. RR-002 is the current character-framework task; do not begin RR-003 or later gameplay tasks until RR-002 is accepted.
 3. Preserve offline single-player operation; network services must never be required to boot or play offline.
 4. Use Godot 4.x stable and typed GDScript. Add C++ GDExtension only with profiling evidence and an ADR.
 5. Keep AI orchestration in a separate Python/FastAPI service with OpenAI, Bedrock, and custom provider adapters. Never call remote AI from frame, input, movement, combat, or enemy decision loops.
