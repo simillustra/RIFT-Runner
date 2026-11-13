@@ -18,17 +18,28 @@ func _run() -> void:
 
 	if root.has_node("GameState"):
 		var game_state: Node = root.get_node("GameState")
-		game_state.mark_initialized()
-		_check(game_state.is_initialized, "GameState initializes")
-		_check(game_state.current_phase == game_state.Phase.MENU, "boot transitions to menu")
+		game_state.call("mark_initialized")
+		_check(bool(game_state.get("is_initialized")), "GameState initializes")
+		_check(int(game_state.get("current_phase")) == 1, "boot transitions to menu")
+
+	if root.has_node("SceneRouter"):
+		var scene_router: Node = root.get_node("SceneRouter")
+		var missing_scene_result: int = int(scene_router.call("change_scene", "res://missing_scene.tscn"))
+		_check(missing_scene_result == ERR_FILE_NOT_FOUND, "SceneRouter rejects missing scenes")
+
+	if root.has_node("ConfigService"):
+		var config_service: Node = root.get_node("ConfigService")
+		var setting_error: int = int(config_service.call("set_setting", "rr001_smoke_setting", true))
+		_check(setting_error == OK, "ConfigService persists a setting")
+		_check(bool(config_service.call("get_setting", "rr001_smoke_setting", false)), "ConfigService reads a setting")
 
 	if root.has_node("SaveService"):
 		var save_service: Node = root.get_node("SaveService")
 		var sample: Dictionary = {"rr001_smoke": true, "schema": 1}
-		var save_error: Error = save_service.save_game(sample)
-		_check(save_error == OK, "save service writes local data")
-		var loaded: Dictionary = save_service.load_game()
-		_check(loaded.get("rr001_smoke", false) == true, "save service reads local data")
+		var save_error: int = int(save_service.call("save_game", sample))
+		_check(save_error == OK, "SaveService writes local data")
+		var loaded: Dictionary = save_service.call("load_game")
+		_check(loaded.get("rr001_smoke", false) == true, "SaveService reads local data")
 
 	if failures == 0:
 		print("RR-001 smoke test: PASS")
