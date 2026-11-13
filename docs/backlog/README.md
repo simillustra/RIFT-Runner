@@ -1,12 +1,12 @@
 # Backlog
 
-All implementation work must reference one of these backlog IDs. RR-001 has been merged; RR-002 is the active implementation task.
+RR-001 and RR-002 have been merged. RR-002 CI validation follow-up is tracked in the current documentation/CI maintenance PR. RR-003 remains blocked until the character-framework smoke test passes on the corrected workflow.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
 | RR-001 | Project Foundation | P0 | Accepted / merged |
-| RR-002 | Character Framework | P0 | In progress |
-| RR-003 | Movement Engine | P0 | Not started |
+| RR-002 | Character Framework | P0 | Merged; CI follow-up open |
+| RR-003 | Movement Engine | P0 | Blocked |
 | RR-004 | Animation Framework | P0 | Not started |
 | RR-005 | Combat System | P0 | Not started |
 | RR-006 | Mobile Input | P0 | Not started |

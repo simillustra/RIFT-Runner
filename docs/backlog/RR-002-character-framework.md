@@ -1,34 +1,25 @@
 # RR-002 — Character Framework
 
 **Priority:** P0  
-**Status:** Implementation in progress  
+**Status:** Merged; CI validation follow-up open  
+**Merged PR:** [#2](https://github.com/simillustra/RIFT-Runner/pull/2)  
 **Depends on:** RR-001 — Project Foundation (merged)
 
-## Goal
-Establish reusable, data-driven character identity and baseline attribute definitions for the planned hero roster without implementing movement, animation, or combat.
+## Delivered
+- Typed resources for character identity, archetype, stats and ability metadata.
+- Validated roster with stable ID lookup and duplicate detection.
+- CharacterBody3D actor root with capsule collision placeholder and definition assignment.
+- Data assets for Vanguard, Phantom and Cipher.
+- Headless smoke test for resource loading, validation, lookup and actor assignment.
 
-## Scope
-- Typed resources for character identity, archetype, stats, and ability metadata.
-- A validated character roster with stable ID lookup and duplicate detection.
-- A lightweight CharacterBody3D actor root with a placeholder collision shape and safe definition assignment.
-- Initial data assets for Vanguard, Phantom, and Cipher.
-- Automated tests for resource loading, validation, lookup, and actor assignment.
-- Documentation of ownership boundaries for future movement, animation, input, and combat systems.
+## CI follow-up
+The merged-head run failed while parsing tests/smoke_test.gd because the Godot global script class cache had not been generated before the test script was loaded. The workflow now performs a headless editor import/class-registration step before running the smoke test. This fix must pass on CI before RR-003 is unblocked.
 
-## Acceptance criteria
-- [ ] CharacterStats validates numeric ranges and provides explicit typed attributes.
-- [ ] AbilityDefinition provides descriptive metadata only and validates required fields.
-- [ ] CharacterDefinition validates identity, stats, and ability metadata.
-- [ ] CharacterRoster validates all entries, detects duplicate IDs, and resolves heroes by stable ID.
-- [ ] Vanguard, Phantom, and Cipher load from data assets with unique IDs and one signature ability metadata record each.
-- [ ] CharacterActor accepts valid definitions and rejects null/invalid definitions.
-- [ ] Actor scene has a usable 3D collision placeholder and does not implement movement, animation, or combat.
-- [ ] Headless smoke test covers RR-002 loading and assignment.
-- [ ] Documentation and backlog status are updated.
-- [ ] CI passes on the PR head.
+## Scope boundary
+No movement, camera, animation, combat, ability execution, input, progression, multiplayer or AI runtime implementation is included. Ability resources are metadata only.
 
-## Non-goals
-Movement controllers, camera behavior, animation graphs, combat, ability execution, input bindings, character progression, hero visuals, multiplayer replication, and AI are separate backlog items.
-
-## Data conventions
-Character IDs and ability IDs are stable StringName identifiers. Stats and ability values are tuning metadata, not behavior. Future systems consume these resources through narrow interfaces and must not add runtime responsibilities to the data resources.
+## Acceptance evidence
+- [x] Character resource and actor implementation merged.
+- [ ] Corrected CI workflow passes on main.
+- [ ] RR-002 validation follow-up reviewed and accepted.
+- [ ] RR-003 remains blocked until the follow-up is accepted.
