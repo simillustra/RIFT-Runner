@@ -23,11 +23,11 @@ The repository foundation is being established under **RR-001 — Project Founda
 - Python/FastAPI AI orchestration with provider adapters (OpenAI, Amazon Bedrock, and custom providers) as a separate service
 - Nakama planned for future online services; offline single-player remains a first-class requirement
 
-Exact engine patch versions, export templates, SDK versions, and CI image tags must be pinned by the implementation environment and recorded in the build report.
+The CI workflow pins Godot 4.4.1. Export templates, Android/iOS SDK versions, and signing requirements must be pinned and recorded in release environments.
 
 ## Local development
 
-1. Install a supported Godot 4.x stable release.
+1. Install Godot 4.4.1 stable.
 2. Open `project.godot` in Godot.
 3. Run the project (F6/F5) or execute the headless smoke test:
 

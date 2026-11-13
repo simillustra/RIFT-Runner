@@ -1,0 +1,27 @@
+; RIFT RUNNERS — RR-001 project foundation
+; Engine baseline: Godot 4.4.1 stable (CI pinned to this version).
+config_version=5
+
+[application]
+config/name="RIFT RUNNERS"
+run/main_scene="res://game/scenes/bootstrap.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+
+[autoload]
+EventBus="*res://game/scripts/core/event_bus.gd"
+GameState="*res://game/scripts/core/game_state.gd"
+SceneRouter="*res://game/scripts/core/scene_router.gd"
+ConfigService="*res://game/scripts/core/config_service.gd"
+SaveService="*res://game/scripts/core/save_service.gd"
+
+[display]
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.025, 0.03, 0.045, 1)
