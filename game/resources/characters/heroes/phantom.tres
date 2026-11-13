@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterDefinition" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/characters/character_definition.gd" id="1_definition"]
+[ext_resource type="Script" path="res://game/scripts/characters/character_stats.gd" id="2_stats"]
+[ext_resource type="Script" path="res://game/scripts/characters/ability_definition.gd" id="2_ability_script"]
+[ext_resource type="Resource" path="res://game/resources/characters/abilities/phantom_phase_shift.tres" id="3_ability"]
+
+[sub_resource type="Resource" id="CharacterStats_phantom"]
+script = ExtResource("2_stats")
+max_health = 90.0
+movement_speed = 6.5
+attack_power = 14.0
+defense = 4.0
+
+[resource]
+script = ExtResource("1_definition")
+character_id = &"phantom"
+display_name = "Phantom"
+archetype = &"assassin"
+description = "A fast, evasive hero built around repositioning and precision."
+stats = SubResource("CharacterStats_phantom")
+abilities = Array[ExtResource("2_ability_script")]([ExtResource("3_ability")])

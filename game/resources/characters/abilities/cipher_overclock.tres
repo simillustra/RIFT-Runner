@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/characters/ability_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ability_id = &"overclock"
+display_name = "Overclock"
+description = "A tactical enhancement signature ability concept. Runtime behavior is not implemented in RR-002."
+cooldown_seconds = 22.0
+duration_seconds = 5.0
+tags = PackedStringArray("tactical", "signature")
