@@ -1,0 +1,11 @@
+# Release Checklist
+- [ ] Product scope/acceptance signed off.
+- [ ] All P0 backlog items accepted.
+- [ ] Android build installs, launches, resumes and passes device QA.
+- [ ] iOS export/device validation completed or explicitly deferred.
+- [ ] Performance, memory and thermal results meet approved budgets.
+- [ ] Crash reporting/privacy disclosures reviewed.
+- [ ] Asset licenses and third-party notices audited.
+- [ ] No secrets/signing files in Git.
+- [ ] Save migration/rollback verified.
+- [ ] Release notes, version and support process prepared.

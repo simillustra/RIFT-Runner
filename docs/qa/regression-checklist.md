@@ -1,0 +1,11 @@
+# Regression Checklist
+- [ ] Project opens with pinned Godot version.
+- [ ] Bootstrap/autoloads initialize.
+- [ ] Offline startup makes no mandatory network request.
+- [ ] Settings persist and defaults work on first run.
+- [ ] Save round-trip works; unsupported versions fail safely.
+- [ ] Hero roster loads and validates.
+- [ ] Duplicate IDs and invalid resources are rejected.
+- [ ] CharacterActor accepts valid and rejects invalid/null definitions.
+- [ ] RR-002 introduces no movement/combat/animation behavior.
+- [ ] Headless CI smoke test passes.
