@@ -1,34 +1,22 @@
 # RIFT RUNNERS
 
-Mobile-first third-person 3D action-survival runner built with Godot 4.x.
+Mobile-first third-person 3D action-survival runner built with Godot 4.4.1.
 
 ## Project status
-
-RR-001 — Project Foundation is merged. RR-002 — Character Framework is in progress. Later gameplay tasks remain gated by their backlog acceptance criteria.
+RR-001 is merged. RR-002 is merged via [PR #2](https://github.com/simillustra/RIFT-Runner/pull/2), with a CI validation follow-up required: the merged-head smoke test failed to resolve global script classes because the editor import/class scan was not run first. RR-003 remains blocked pending that fix.
 
 ## Documentation
+The complete required documentation structure is indexed in [docs/README.md](docs/README.md).
 
-- [Product overview](docs/product/OVERVIEW.md)
-- [Architecture](docs/architecture/ARCHITECTURE.md)
-- [Character framework](docs/architecture/CHARACTER_FRAMEWORK.md)
-- [Technical decisions](docs/architecture/DECISIONS.md)
-- [Development workflow](docs/development/WORKFLOW.md)
-- [Testing strategy](docs/quality/TESTING.md)
-- [Backlog index](docs/backlog/README.md)
+Key entry points: [PRD](docs/product/PRD.md), [GDD](docs/product/GDD.md), [SRS](docs/product/SRS.md), [Architecture](docs/architecture/ARCHITECTURE.md), [Engineering standards](docs/engineering/coding-standards.md), [Character design](docs/gameplay/characters.md), [Test strategy](docs/qa/TEST-STRATEGY.md), [Backlog](docs/project-management/engineering-backlog.md).
 
-## Technology baseline
-
-- Godot 4.4.1 and typed GDScript for game runtime
-- C++ GDExtension only when profiling demonstrates a justified native-code need
-- Python/FastAPI AI orchestration with provider adapters (OpenAI, Amazon Bedrock, and custom providers) as a separate service
-- Nakama planned for future online services; offline single-player remains a first-class requirement
+## Technology
+Godot 4.4.1 and typed GDScript. C++ GDExtension only with profiling evidence. Future AI orchestration is a separate Python/FastAPI service with OpenAI, Amazon Bedrock and custom provider adapters. Nakama is planned for future online services. Offline single-player remains first-class.
 
 ## Local development
+Install Godot 4.4.1 stable, open project.godot, then run:
 
-1. Install Godot 4.4.1 stable.
-2. Open `project.godot` in Godot.
-3. Run the project (F6/F5) or execute the headless smoke test:
-
+    godot --headless --editor --path . --quit
     godot --headless --path . --script res://tests/smoke_test.gd
 
-The smoke test uses only Godot's built-in APIs and does not require an external test addon. See [AGENTS.md](AGENTS.md) for coding-agent rules.
+See [AGENTS.md](AGENTS.md) for coding-agent rules.
