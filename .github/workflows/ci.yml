@@ -1,0 +1,22 @@
+name: Godot CI
+
+on:
+  push:
+    branches: ["main", "rr-001/**"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  foundation-smoke:
+    name: Foundation smoke test
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Verify engine version
+        run: godot --version
+      - name: Run headless foundation smoke test
+        run: godot --headless --path . --script res://tests/smoke_test.gd
