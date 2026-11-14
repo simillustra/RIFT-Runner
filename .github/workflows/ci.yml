@@ -2,7 +2,7 @@ name: Godot CI
 
 on:
   push:
-    branches: ["main", "rr-001/**", "feat/rr-006/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-007-*", "feat/rr-008/**", "feat/rr-008-*", "feat/rr-007-008*", "docs/**"]
+    branches: ["main", "rr-001/**", "feat/rr-006/**", "rr-003/**", "feat/rr-003-*", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-007-*", "feat/rr-008/**", "feat/rr-008-*", "feat/rr-007-008*", "docs/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -28,6 +28,8 @@ jobs:
         run: godot --headless --path . --script res://tests/movement_physics_fixture_test.gd
       - name: Run RR-003 jump physics test suite
         run: godot --headless --path . --script res://tests/movement_jump_physics_test.gd
+      - name: Run RR-003 lane physics test suite
+        run: godot --headless --path . --script res://tests/movement_lane_physics_test.gd
       - name: Run animation profile test suite
         run: godot --headless --path . --script res://tests/animation_profile_test.gd
       - name: Run animation tree graph test suite
