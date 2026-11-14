@@ -41,7 +41,7 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Pass the RR-003 D1 deterministic physics-fixture test in CI: [run #43649232438](https://github.com/simillustra/RIFT-Runner/actions/runs/43649232438).
 - [x] Pass the RR-003 D2 jump/grounded physics test in CI: [run #43649596655](https://github.com/simillustra/RIFT-Runner/actions/runs/43649596655).
 - [x] Pass the RR-003 D3 lane boundary/convergence physics test in CI: [run #43650468004](https://github.com/simillustra/RIFT-Runner/actions/runs/43650468004).
-- [x] Pass the RR-003 D4 camera-relative free-movement physics test in CI: [run #43651408510](https://github.com/simillustra/RIFT-Runner/actions/runs/43651408510) — pending result at D5 branch creation.
+- [ ] Pass the RR-003 D4 camera-relative free-movement physics test in CI: [run #43651408510](https://github.com/simillustra/RIFT-Runner/actions/runs/43651408510) — pending.
 - [ ] Pass the RR-003 D5 invalid delta/configuration/ownership safety test in CI.
 - [ ] Run the full CI suite on the final acceptance commit.
 
