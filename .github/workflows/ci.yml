@@ -36,6 +36,8 @@ jobs:
         run: godot --headless --path . --script res://tests/character_animation_controller_test.gd
       - name: Run character animation integration test suite
         run: godot --headless --path . --script res://tests/character_animation_integration_test.gd
+      - name: Run RR-004 D7 production rig validator test suite
+        run: godot --headless --path . --script res://tests/animation_production_rig_validator_d7_test.gd
       - name: Run hero animation profile test suite
         run: godot --headless --path . --script res://tests/hero_animation_profile_test.gd
       - name: Run animation asset-contract validation suite

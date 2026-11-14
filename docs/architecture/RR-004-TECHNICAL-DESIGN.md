@@ -1,6 +1,6 @@
 # RR-004 — Animation Framework Technical Design
 
-**Status:** D1-D6 implementation merged; D7 automated validation baseline in review; visual/device sign-off outstanding  
+**Status:** D1-D6 implementation merged; D7 automated validation baseline merged; production rig, visual/device sign-off outstanding  
 **Engine:** Godot 4.4.1 · Typed GDScript  
 **Dependency:** RR-003 movement state contract
 
@@ -70,6 +70,7 @@ Current resources intentionally reference the canonical clip IDs `idle`, `move`,
 - D5 integration tests validate actor loading with and without animation nodes, adapter wiring and movement-state immutability.
 - D6 tests load and validate all three hero profile resources and check unique profile/rig identifiers.
 - D7 automated asset-contract tests validate each hero profile against an AnimationPlayer fixture and verify generated graph clip references.
+- D7 production rig validator checks imported Skeleton3D ownership, AnimationPlayer root, clip duration, animation track paths and bone references.
 - D7 manual visual/device evidence is tracked in `docs/qa/RR-004-D7-VALIDATION-MATRIX.md`; empty fixture clips are not visual proof.
 
 ## Milestones

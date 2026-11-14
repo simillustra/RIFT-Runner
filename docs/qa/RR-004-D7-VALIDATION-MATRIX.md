@@ -1,7 +1,9 @@
 # RR-004 D7 — Validation Evidence Matrix
 
 **Current status:** No production hero rig or device capture has been recorded in this repository.  
-**Automated baseline:** See `tests/animation_rig_validation_test.gd`; its empty fixture clips are not visual proof.
+**Automated baseline:** `tests/animation_rig_validation_test.gd` validates graph wiring with empty fixture clips. `tests/animation_production_rig_validator_d7_test.gd` validates the production rig validator against a synthetic Skeleton3D fixture; neither test is visual proof.
+
+**Asset validation tooling:** `game/scripts/characters/animation_rig_validator.gd` checks imported rig ownership, AnimationPlayer root resolution, profile/rig ID compatibility, clip availability/duration, animation track node paths and Skeleton3D bone references.
 
 ## Hero asset validation
 
