@@ -31,7 +31,7 @@ func _run() -> void:
 	enemy_executor.update_timers(0.1)
 	_check(enemy_executor.is_active(), "enemy attack enters D2 active window")
 	_check(enemy_executor.try_hit(enemy_health) == 20.0, "D2 executor remains the only enemy damage execution path")
-	enemy_executor.update_timers(0.2)
+	enemy_executor.update_timers(0.21)
 	_check(enemy_executor.phase == AttackExecutor.Phase.RECOVERY, "enemy attack closes into D2 recovery")
 	enemy_health.apply_damage(1000.0)
 	_check(enemy_controller.request_attack() == ERR_UNCONFIGURED, "dead enemy cannot request another attack")

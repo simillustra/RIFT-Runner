@@ -51,6 +51,8 @@ func set_target(next_target: Node3D) -> void:
 	if target == next_target:
 		return
 	_release_attack_slot()
+	if _executor != null:
+		_executor.cancel_attack()
 	target = next_target
 	target_changed.emit(target)
 	if current_state == State.IDLE:
@@ -60,6 +62,8 @@ func clear_target() -> void:
 	if target == null:
 		return
 	_release_attack_slot()
+	if _executor != null:
+		_executor.cancel_attack()
 	target = null
 	target_changed.emit(null)
 	if current_state != State.DEAD and current_state != State.STAGGERED:

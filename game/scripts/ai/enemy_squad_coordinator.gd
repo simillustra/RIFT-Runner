@@ -12,6 +12,8 @@ var _target_by_member: Dictionary = {}
 func request_attack_slot(member: Node3D, target: Node3D) -> bool:
 	if not is_instance_valid(member) or not is_instance_valid(target) or member == target:
 		return false
+	if max_simultaneous_attackers_per_target < 1:
+		return false
 	var member_id: int = member.get_instance_id()
 	var target_id: int = target.get_instance_id()
 	if _target_by_member.has(member_id):
@@ -22,7 +24,7 @@ func request_attack_slot(member: Node3D, target: Node3D) -> bool:
 	var bucket: Array = _attackers_by_target.get(target_id, [])
 	if bucket.size() >= max_simultaneous_attackers_per_target:
 		return false
-	bucket.append(member)
+	bucket.append(member_id)
 	_attackers_by_target[target_id] = bucket
 	_target_by_member[member_id] = target_id
 	attack_slot_granted.emit(member, target)
@@ -38,8 +40,7 @@ func release_attack_slot(member: Node3D) -> void:
 	_target_by_member.erase(member_id)
 	var bucket: Array = _attackers_by_target.get(target_id, [])
 	for index: int in range(bucket.size() - 1, -1, -1):
-		var occupant: Node3D = bucket[index] as Node3D
-		if not is_instance_valid(occupant) or occupant.get_instance_id() == member_id:
+		if int(bucket[index]) == member_id:
 			bucket.remove_at(index)
 	if bucket.is_empty():
 		_attackers_by_target.erase(target_id)
@@ -62,13 +63,11 @@ func has_attack_slot(member: Node3D) -> bool:
 func _cleanup_target(target_id: int) -> void:
 	var bucket: Array = _attackers_by_target.get(target_id, [])
 	for index: int in range(bucket.size() - 1, -1, -1):
-		var occupant: Node3D = bucket[index] as Node3D
-		if not is_instance_valid(occupant):
+		var member_id: int = int(bucket[index])
+		var occupant := instance_from_id(member_id) as Node3D
+		if not is_instance_valid(occupant) or not _target_by_member.has(member_id) or int(_target_by_member[member_id]) != target_id:
 			bucket.remove_at(index)
-			continue
-		var member_id: int = occupant.get_instance_id()
-		if not _target_by_member.has(member_id) or int(_target_by_member[member_id]) != target_id:
-			bucket.remove_at(index)
+			_target_by_member.erase(member_id)
 	if bucket.is_empty():
 		_attackers_by_target.erase(target_id)
 	else:
