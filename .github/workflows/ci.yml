@@ -34,6 +34,8 @@ jobs:
         run: godot --headless --path . --script res://tests/movement_free_physics_test.gd
       - name: Run RR-003 movement safety test suite
         run: godot --headless --path . --script res://tests/movement_safety_d5_test.gd
+      - name: Run RR-003 production actor integration and collision test suite
+        run: godot --headless --path . --script res://tests/movement_actor_integration_d6_test.gd
       - name: Run animation profile test suite
         run: godot --headless --path . --script res://tests/animation_profile_test.gd
       - name: Run animation tree graph test suite

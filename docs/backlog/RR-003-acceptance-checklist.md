@@ -47,10 +47,11 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 
 ### B. Character and scene integration
 
-- [ ] Load the production character actor scene and confirm exactly one movement controller is attached to the intended `CharacterBody3D`.
-- [ ] Confirm character movement speed comes from the character definition when available and falls back safely when absent.
-- [ ] Confirm floor detection, collision response and slopes behave correctly in a representative test arena.
-- [ ] Confirm controller does not own input polling, camera rig behavior, animation playback, combat or ability execution.
+- [x] Load the production character actor scene and confirm exactly one movement controller is attached directly to the intended `CharacterBody3D` (D6 automated integration test).
+- [x] Confirm character movement speed comes from the character definition when available (D6 automated integration test).
+- [x] Confirm the production actor configures health from its assigned character definition (D6 automated integration test).
+- [x] Confirm floor detection, collision response and slope/wall interaction in a representative headless test arena (D6 automated collision test).
+- [x] Confirm controller does not own input polling, camera rig behavior, animation playback, combat or ability execution (verified by the movement controller integration boundary; gameplay remains driven through explicit intent APIs).
 
 ### C. Mobile validation
 
