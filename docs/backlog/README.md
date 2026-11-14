@@ -1,6 +1,6 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning is in implementation. RR-008 D1-D5 foundations are merged; D6 encounter-level tactical coordination is in implementation.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning merged. RR-008 D1-D6 encounter-level tactical coordination are merged; gameplay/device validation remains open.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
@@ -9,7 +9,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
 | RR-004 | Animation Framework | P0 | D1-D6 and D7 automated baseline merged; visual/device sign-off open |
 | RR-005 | Combat System | P0 | D1-D7 merged; device and encounter sign-off open |
-| RR-006 | Mobile Input | P0 | Not started |
+| RR-006 | Mobile Input | P0 | D1 contract implementation |
 | RR-007 | Procedural World | P0 | D1-D4 and D5.1 runtime streaming/pooling merged; D5.3 runtime enemy spawning in implementation |
 | RR-008 | Enemy AI | P0 | D1-D5 foundations merged; D6 tactical coordination in implementation |
 | RR-009 | Progression and Rewards | P0 | Not started |
