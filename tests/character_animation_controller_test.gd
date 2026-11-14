@@ -69,6 +69,7 @@ func _run() -> void:
 	_check(controller.get_current_state() == CharacterAnimationGraph.STATE_FALLING, "negative vertical velocity selects Falling")
 
 	movement.is_grounded = true
+	actor.velocity = Vector3.ZERO
 	controller.update_animation(0.016)
 	_check(controller.get_current_state() == CharacterAnimationGraph.STATE_LANDING, "airborne-to-grounded edge selects Landing")
 	controller.update_animation(0.20)

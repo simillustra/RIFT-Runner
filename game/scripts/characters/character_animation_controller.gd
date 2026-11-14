@@ -111,7 +111,9 @@ func _select_state(snapshot: CharacterAnimationState, planar_speed: float, delta
 		return CharacterAnimationGraph.STATE_RISING if snapshot.vertical_velocity > 0.0 else CharacterAnimationGraph.STATE_FALLING
 
 	_jump_start_remaining = 0.0
-	if not _was_grounded:
+	# Startup can report grounded only after the first physics floor sample.
+	# That initialization edge is not a real landing transition.
+	if not _was_grounded and not _current_state.is_empty():
 		_landing_remaining = landing_hold_seconds
 		return CharacterAnimationGraph.STATE_LANDING
 	if _landing_remaining > 0.0:
