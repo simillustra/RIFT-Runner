@@ -45,6 +45,23 @@ func _ready() -> void:
 	if lose_target_range < detection_range:
 		push_warning("EnemyAIController lose_target_range should be at least detection_range.")
 
+func reset_for_spawn() -> void:
+	_release_attack_slot()
+	if _executor != null:
+		_executor.cancel_attack()
+	target = null
+	_attack_retry_remaining = 0.0
+	_stagger_remaining = 0.0
+	_transition_to(State.IDLE)
+
+func assign_squad_coordinator(coordinator: EnemySquadCoordinator) -> void:
+	if _attack_slot_reserved:
+		_release_attack_slot()
+	_squad_coordinator = coordinator
+
+func has_squad_coordinator() -> bool:
+	return is_instance_valid(_squad_coordinator)
+
 func set_target(next_target: Node3D) -> void:
 	if current_state == State.DEAD or not is_instance_valid(next_target):
 		return

@@ -27,6 +27,7 @@ var _last_exit_socket: Marker3D
 var _pool_root: Node3D
 var _pool_by_definition: Dictionary = {}
 var _pooled_segment_count: int = 0
+var _next_segment_index: int = 0
 
 func _ready() -> void:
 	_ensure_pool_root()
@@ -105,6 +106,8 @@ func append_next_segment() -> Node3D:
 	segment.set_meta("segment_id", selected.segment_id)
 	segment.set_meta("theme_id", selected.theme_id)
 	segment.set_meta("segment_definition", selected)
+	segment.set_meta("segment_index", _next_segment_index)
+	_next_segment_index += 1
 	_generated_segments.append(segment)
 	_generated_segment_ids.append(selected.segment_id)
 	_last_definition = selected
@@ -142,6 +145,7 @@ func clear_generated_segments() -> void:
 	_generated_segment_ids.clear()
 	_last_definition = null
 	_last_exit_socket = null
+	_next_segment_index = 0
 	_clear_pool()
 	generation_reset.emit()
 
