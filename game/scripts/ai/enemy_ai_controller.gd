@@ -1,10 +1,12 @@
 extends Node
 class_name EnemyAIController
-## Deterministic local enemy state machine. Perception and locomotion are injected in later milestones.
+## Deterministic local enemy state machine with encounter-scoped tactical coordination.
 signal state_changed(previous_state: int, current_state: int)
 signal target_changed(target: Node3D)
 signal attack_requested
-enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, DEAD }
+
+enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, RETREAT, DEAD }
+
 @export var health_component_path: NodePath = NodePath("../HealthComponent")
 @export var enemy_combat_controller_path: NodePath = NodePath("../EnemyCombatController")
 @export var combat_reaction_controller_path: NodePath = NodePath("../CombatReactionController")
@@ -14,8 +16,14 @@ enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, DEAD }
 @export_range(0.5, 100.0, 0.1) var attack_range: float = 2.0
 @export_range(0.5, 150.0, 0.1) var lose_target_range: float = 18.0
 @export_range(0.05, 2.0, 0.01) var failed_attack_retry_seconds: float = 0.25
+@export_range(0.0, 1.0, 0.01) var retreat_health_ratio: float = 0.3
+@export_range(1.0, 40.0, 0.5) var retreat_distance: float = 8.0
+@export_range(0.0, 5.0, 0.1) var retreat_recovery_seconds: float = 1.0
+@export var retreat_enabled: bool = true
+
 var current_state: int = State.IDLE
 var target: Node3D
+var assigned_tactical_role: int = EnemySquadCoordinator.TacticalRole.PURSUER
 var _health: HealthComponent
 var _combat: EnemyCombatController
 var _reactions: CombatReactionController
@@ -24,6 +32,8 @@ var _squad_coordinator: EnemySquadCoordinator
 var _attack_slot_reserved: bool = false
 var _attack_retry_remaining: float = 0.0
 var _stagger_remaining: float = 0.0
+var _retreat_recovery_remaining: float = 0.0
+var _retreat_used: bool = false
 
 func _ready() -> void:
 	_health = get_node_or_null(health_component_path) as HealthComponent
@@ -36,28 +46,31 @@ func _ready() -> void:
 	if _reactions != null:
 		_reactions.stagger_started.connect(_on_reaction_stagger_started)
 		_reactions.death_presented.connect(set_dead)
-	if _health == null:
-		push_warning("EnemyAIController requires a HealthComponent at '%s'." % health_component_path)
-	else:
+	if _health != null:
 		_health.died.connect(_on_health_died)
-	if attack_range > detection_range:
-		push_warning("EnemyAIController attack_range should not exceed detection_range.")
-	if lose_target_range < detection_range:
-		push_warning("EnemyAIController lose_target_range should be at least detection_range.")
+	else:
+		push_warning("EnemyAIController requires a HealthComponent at '%s'." % health_component_path)
 
 func reset_for_spawn() -> void:
 	_release_attack_slot()
-	if _executor != null:
-		_executor.cancel_attack()
+	if is_instance_valid(_squad_coordinator):
+		_squad_coordinator.release_member_claims(get_parent() as Node3D)
 	target = null
 	_attack_retry_remaining = 0.0
 	_stagger_remaining = 0.0
+	_retreat_recovery_remaining = 0.0
+	_retreat_used = false
 	_transition_to(State.IDLE)
 
-func assign_squad_coordinator(coordinator: EnemySquadCoordinator) -> void:
-	if _attack_slot_reserved:
-		_release_attack_slot()
+func assign_squad_coordinator(coordinator: EnemySquadCoordinator, engagement_policy: int = 0) -> void:
+	var actor := get_parent() as Node3D
+	if is_instance_valid(_squad_coordinator) and _squad_coordinator != coordinator and actor != null:
+		_squad_coordinator.unregister_member(actor)
 	_squad_coordinator = coordinator
+	if is_instance_valid(_squad_coordinator) and actor != null:
+		assigned_tactical_role = _squad_coordinator.register_member(actor, engagement_policy)
+	else:
+		assigned_tactical_role = EnemySquadCoordinator.TacticalRole.PURSUER
 
 func has_squad_coordinator() -> bool:
 	return is_instance_valid(_squad_coordinator)
@@ -67,7 +80,7 @@ func set_target(next_target: Node3D) -> void:
 		return
 	if target == next_target:
 		return
-	_release_attack_slot()
+	_release_tactical_target_claims()
 	if _executor != null:
 		_executor.cancel_attack()
 	target = next_target
@@ -76,9 +89,9 @@ func set_target(next_target: Node3D) -> void:
 		_transition_to(State.ALERT)
 
 func clear_target() -> void:
-	if target == null:
+	if target == null and not _attack_slot_reserved:
 		return
-	_release_attack_slot()
+	_release_tactical_target_claims()
 	if _executor != null:
 		_executor.cancel_attack()
 	target = null
@@ -102,22 +115,46 @@ func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 func set_dead() -> void:
 	if current_state == State.DEAD:
 		return
-	_release_attack_slot()
+	_release_tactical_target_claims()
+	var actor := get_parent() as Node3D
+	if is_instance_valid(_squad_coordinator) and actor != null:
+		_squad_coordinator.unregister_member(actor)
 	if _executor != null:
 		_executor.cancel_attack()
 	target = null
 	target_changed.emit(null)
 	_transition_to(State.DEAD)
 
-## Public deterministic decision step, also called by _physics_process.
+func complete_retreat() -> void:
+	if current_state != State.RETREAT:
+		return
+	var actor := get_parent() as Node3D
+	if is_instance_valid(_squad_coordinator) and actor != null and is_instance_valid(target):
+		_squad_coordinator.set_member_retreating(actor, target, false)
+	_retreat_recovery_remaining = retreat_recovery_seconds
+	_transition_to(State.ALERT)
+	if _retreat_recovery_remaining <= 0.0 and is_instance_valid(target):
+		_transition_to(State.CHASE)
+
 func update_decision(delta: float) -> void:
 	if delta <= 0.0 or current_state == State.DEAD:
 		return
 	if current_state == State.STAGGERED:
-		if _stagger_remaining > 0.0:
-			_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
-			if _stagger_remaining <= 0.0:
-				set_staggered(false)
+		_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
+		if _stagger_remaining <= 0.0:
+			set_staggered(false)
+		return
+	if current_state == State.RETREAT:
+		if not is_instance_valid(target):
+			clear_target()
+			return
+		if _get_target_distance() >= retreat_distance:
+			complete_retreat()
+		return
+	if _retreat_recovery_remaining > 0.0:
+		_retreat_recovery_remaining = maxf(_retreat_recovery_remaining - delta, 0.0)
+		if _retreat_recovery_remaining <= 0.0 and is_instance_valid(target):
+			_transition_to(State.CHASE)
 		return
 	_attack_retry_remaining = maxf(_attack_retry_remaining - delta, 0.0)
 	if is_instance_valid(_health) and _health.is_dead:
@@ -126,14 +163,16 @@ func update_decision(delta: float) -> void:
 	if not is_instance_valid(target):
 		clear_target()
 		return
+	if retreat_enabled and not _retreat_used and is_instance_valid(_health) and _health.get_health_ratio() <= retreat_health_ratio:
+		_begin_retreat()
+		return
 	var distance := _get_target_distance()
 	if distance > lose_target_range:
 		clear_target()
 		return
 	if distance > detection_range:
-		if current_state == State.IDLE:
-			return
-		_transition_to(State.ALERT)
+		if current_state != State.IDLE:
+			_transition_to(State.ALERT)
 		return
 	if distance <= attack_range:
 		_transition_to(State.ATTACK)
@@ -144,6 +183,17 @@ func update_decision(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	update_decision(delta)
 
+func _begin_retreat() -> void:
+	_retreat_used = true
+	_release_attack_slot()
+	if _executor != null:
+		_executor.cancel_attack()
+	var actor := get_parent() as Node3D
+	if is_instance_valid(_squad_coordinator) and actor != null and is_instance_valid(target):
+		_squad_coordinator.release_target_claim(actor)
+		_squad_coordinator.set_member_retreating(actor, target, true)
+	_transition_to(State.RETREAT)
+
 func _get_target_distance() -> float:
 	var actor := get_parent() as Node3D
 	if actor == null or not is_instance_valid(target):
@@ -153,7 +203,7 @@ func _get_target_distance() -> float:
 func _try_request_attack() -> void:
 	if _attack_retry_remaining > 0.0 or _combat == null:
 		return
-	if _squad_coordinator != null and not _attack_slot_reserved:
+	if is_instance_valid(_squad_coordinator) and not _attack_slot_reserved:
 		if not _squad_coordinator.request_attack_slot(get_parent() as Node3D, target):
 			_attack_retry_remaining = failed_attack_retry_seconds
 			return
@@ -172,8 +222,13 @@ func _on_attack_finished(_definition: AttackDefinition) -> void:
 func _release_attack_slot() -> void:
 	if not _attack_slot_reserved:
 		return
-	if _squad_coordinator != null:
+	if is_instance_valid(_squad_coordinator):
 		_squad_coordinator.release_attack_slot(get_parent() as Node3D)
+	_attack_slot_reserved = false
+
+func _release_tactical_target_claims() -> void:
+	if is_instance_valid(_squad_coordinator):
+		_squad_coordinator.release_target_claim(get_parent() as Node3D)
 	_attack_slot_reserved = false
 
 func _transition_to(next_state: int) -> void:
