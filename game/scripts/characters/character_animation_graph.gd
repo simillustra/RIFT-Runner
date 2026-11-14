@@ -26,7 +26,7 @@ static func create_state_machine(profile: AnimationProfile) -> AnimationNodeStat
 		return null
 	var machine := AnimationNodeStateMachine.new()
 	machine.resource_name = "Locomotion"
-	machine.initial_node = STATE_IDLE
+	machine.start_node = STATE_IDLE
 	machine.add_node(STATE_IDLE, _animation_node(profile.get_clip(&"idle")), Vector2(0.0, 0.0))
 	machine.add_node(STATE_MOVE, _create_move_blend_space(profile), Vector2(240.0, 0.0))
 	machine.add_node(STATE_JUMP_START, _animation_node(profile.get_clip(&"jump_start")), Vector2(0.0, 180.0))
@@ -63,8 +63,8 @@ static func validate_state_machine(machine: AnimationNodeStateMachine) -> Packed
 		errors.append("Move state must use AnimationNodeBlendSpace2D.")
 	elif move_node.get_blend_point_count() != 5:
 		errors.append("Move BlendSpace2D must define exactly five directional/idle points.")
-	if machine.initial_node != STATE_IDLE:
-		errors.append("Animation state machine initial node must be Idle.")
+	if machine.start_node != STATE_IDLE:
+		errors.append("Animation state machine start node must be Idle.")
 	return errors
 
 static func get_playback(tree: AnimationTree) -> AnimationNodeStateMachinePlayback:
