@@ -20,6 +20,27 @@ func _run() -> void:
 	var x := extra.get_node("EnemyAIController") as EnemyAIController
 	ai.set_target(target); f.set_target(target); x.set_target(target)
 	_check(f.assigned_squad_role == 1 and x.assigned_squad_role == 0, "role capacity and deterministic fallback")
+	var moving_flanker := _make_enemy("MovingFlanker", EnemyArchetypeProfile.SquadRole.FLANKER)
+	world.add_child(moving_flanker)
+	await process_frame
+	var moving_ai := moving_flanker.get_node("EnemyAIController") as EnemyAIController
+	var moving_chase := moving_flanker.get_node("EnemyChaseController") as EnemyChaseController
+	moving_ai.set_target(target)
+	moving_ai.current_state = EnemyAIController.State.CHASE
+	moving_ai.attack_range = 1.0
+	moving_chase.preferred_attack_distance = 3.0
+	_check(absf(moving_chase.update_steering(0.1).x) > 0.01, "flanker role produces lateral repositioning")
+	var support := _make_enemy("Support", EnemyArchetypeProfile.SquadRole.SUPPORT)
+	world.add_child(support)
+	await process_frame
+	var support_ai := support.get_node("EnemyAIController") as EnemyAIController
+	var support_chase := support.get_node("EnemyChaseController") as EnemyChaseController
+	support.position = Vector3(0.0, 0.0, -7.5)
+	support_ai.set_target(target)
+	support_ai.current_state = EnemyAIController.State.CHASE
+	support_ai.attack_range = 2.0
+	support_chase.preferred_attack_distance = 1.6
+	_check(support_chase.update_steering(0.1) == Vector3.ZERO, "support role holds safer standoff distance")
 	ai.retreat_health_ratio = 0.5
 	ai.retreat_distance = 6.0
 	(assault.get_node("HealthComponent") as HealthComponent).apply_damage(60.0)
