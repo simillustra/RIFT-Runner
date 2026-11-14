@@ -19,6 +19,10 @@ func _run() -> void:
 	var movement := CharacterMovementController.new()
 	movement.name = "MovementController"
 	actor.add_child(movement)
+	# This suite injects movement snapshots directly; keep the movement physics
+	# loop from overwriting the fixture state between process frames.
+	movement.set_physics_process(false)
+	movement.is_grounded = true
 
 	var player := AnimationPlayer.new()
 	player.name = "AnimationPlayer"
