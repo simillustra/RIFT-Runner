@@ -54,6 +54,7 @@ func _run() -> void:
 	var spawner := EncounterRuntimeSpawner.new()
 	var director := EncounterSpawnDirector.new()
 	director.pacing_profile = EncounterPacingProfile.new()
+	director.pacing_profile.base_budget = 4
 	spawner.spawn_director = director
 	spawner.spawn_definitions = [enemy_definition]
 	generator.add_child(spawner)
