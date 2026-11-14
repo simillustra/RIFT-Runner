@@ -161,6 +161,8 @@ func load_settings() -> Error:
 	if not candidate.validate().is_empty():
 		return ERR_INVALID_DATA
 	settings = candidate
+	_apply_settings_to_controls()
+	settings_changed.emit(settings)
 	return OK
 
 

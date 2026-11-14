@@ -77,6 +77,7 @@ func _run() -> void:
 	_check(manager.update_settings(preferences) == OK, "settings can be changed before reload")
 	_check(manager.load_settings() == OK, "saved settings reload")
 	_check(is_equal_approx(manager.settings.joystick_scale, 1.35) and manager.settings.joystick_side == MobileInputSettings.JoystickSide.LEFT, "saved settings values round-trip")
+	_check(is_equal_approx(joystick.base_radius, 86.4), "reloaded settings are reapplied to registered controls")
 	var invalid := MobileInputSettings.new()
 	invalid.joystick_scale = 4.0
 	_check(manager.update_settings(invalid) == ERR_INVALID_DATA, "invalid accessibility settings are rejected")
