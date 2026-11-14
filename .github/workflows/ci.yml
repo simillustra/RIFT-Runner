@@ -2,7 +2,7 @@ name: Godot CI
 
 on:
   push:
-    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-007-*", "feat/rr-008/**", "feat/rr-007-008*", "docs/**"]
+    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-007-*", "feat/rr-008/**", "feat/rr-008-*", "feat/rr-007-008*", "docs/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:

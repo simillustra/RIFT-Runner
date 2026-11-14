@@ -174,7 +174,7 @@ func get_approach_position(member: Node3D, target: Node3D, role: int, preferred_
 		forward = Vector3.FORWARD
 	forward = forward.normalized()
 	var angle := float(slot_index) * sector_angle
-	var radial := Vector3(sinf(angle), 0.0, -cosf(angle))
+	var radial := Vector3(sin(angle), 0.0, -cos(angle))
 	var facing_basis := Basis(Vector3.UP, target.global_rotation.y)
 	var direction := facing_basis * radial
 	return target.global_position + direction * radius
