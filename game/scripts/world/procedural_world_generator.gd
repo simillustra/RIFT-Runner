@@ -193,7 +193,7 @@ func _find_nearest_segment_index(world_position: Vector3) -> int:
 func _recycle_oldest_segment() -> void:
 	if _generated_segments.is_empty():
 		return
-	var segment := _generated_segments.pop_front()
+	var segment: Node3D = _generated_segments.pop_front() as Node3D
 	_generated_segment_ids.pop_front()
 	if not is_instance_valid(segment):
 		return
