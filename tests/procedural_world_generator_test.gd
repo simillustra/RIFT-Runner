@@ -9,6 +9,9 @@ func _run() -> void:
 	definition_a.obstacle_socket_paths = [NodePath("ObstacleSockets/Obstacle01")]
 	definition_a.traversal_socket_paths = [NodePath("TraversalSockets/Traversal01")]
 	definition_a.hazard_socket_paths = [NodePath("HazardSockets/Hazard01")]
+	definition_b.obstacle_socket_paths = [NodePath("ObstacleSockets/Obstacle01")]
+	definition_b.traversal_socket_paths = [NodePath("TraversalSockets/Traversal01")]
+	definition_b.hazard_socket_paths = [NodePath("HazardSockets/Hazard01")]
 	_check(definition_a.validate().is_empty(), "segment with connection and placement sockets validates")
 	_check(definition_b.can_follow(definition_a), "matching connector profile is compatible")
 	var incompatible := _make_definition(&"alien_gate", 35.0, _make_segment_scene(35.0))
