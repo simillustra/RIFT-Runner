@@ -54,3 +54,7 @@ jobs:
         run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
       - name: Run RR-008 enemy AI controller test suite
         run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
+      - name: Run RR-007 socket compatibility test suite
+        run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
+      - name: Run RR-008 enemy perception test suite
+        run: godot --headless --path . --script res://tests/enemy_perception_test.gd
