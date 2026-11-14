@@ -1,18 +1,32 @@
 # Mobile Input Architecture
 
-**Status:** RR-006 D1-D7 deterministic implementation baseline. HUD and physical device acceptance remain open.
+**Status:** RR-006 D1-D8 implementation baseline. Automated integration and headless throughput diagnostics are included; physical Android/iOS, HUD safe-area and usability sign-off remains outstanding.
 
-1. Device recognizers D2-D4 classify input and emit semantic commands.
-2. MobileInputCommand carries action, phase, mode, vector, strength, ability ID, source ID and sequence.
-3. MobileInputRouter D5/D7 validates, checks hero capability, arbitrates independent movement sources and buffers supported short-lived discrete actions.
-4. MobileInputContextController D6 owns mode/context, recognizer lifecycle and local settings.
-5. Movement, combat, game-state and interaction systems remain authoritative for effects.
+## Goals
 
-## D7 deterministic rules
-- Highest source priority wins movement; equal priority uses ascending source ID.
-- Cancel/release promotes the next contribution.
-- Buffer only supported discrete commands temporarily rejected as busy/unavailable; bounded capacity and deterministic TTL.
-- Buffer flush order: descending priority, ascending source ID, insertion serial.
-- Context disable, focus loss, source release and router teardown clear transient input.
+- Support the two product control modes: **Guided** (virtual joystick and explicit action controls) and **Free-hand** (gesture-driven).
+- Translate device-specific events into a stable, device-neutral semantic action vocabulary.
+- Keep movement, combat, abilities, game state and character health authoritative in their existing gameplay systems.
+- Make gesture grammar configurable and testable; do not freeze unvalidated gesture meanings in the input contract.
+- Keep input processing local and deterministic. No remote AI, network dependency or asynchronous service is permitted in the input-to-gameplay path.
 
-D1 semantic contract; D2 joystick; D3 swipe/drag; D4 tap/press; D5 routing; D6 modes/settings; D7 arbitration/buffering/lifecycle; D8 integrated device acceptance.
+## Layers and ownership
+
+1. **Device recognizers (RR-006 D2-D4):** joystick, touch, swipe and press recognizers. They own pointer tracking, thresholds, gesture classification and cancellation.
+2. **Semantic command (D1):** `MobileInputCommand` carries action, phase, mode, normalized movement vector, strength, optional ability ID, source ID and monotonic sequence ID. It contains intent only.
+3. **Input router (D5/D7):** validates commands, applies context/priority policy, buffers only eligible discrete actions and dispatches supported actions to gameplay interfaces. It must not contain movement physics, attack timing or ability effects.
+4. **Gameplay authorities:** `CharacterMovementController` owns movement requests; `HeroCombatController` owns basic attack and ability acceptance/cooldowns; game-state systems own pause/menu state.
+5. **Presentation:** HUD, animation and VFX observe gameplay state; they do not reinterpret raw touch input.
+
+## Context, priority and lifecycle
+
+- D6 owns atomic control-mode and gameplay-context transitions, local settings and accessibility preferences.
+- D7 arbitrates simultaneous movement sources by priority, uses stable lexical tie-breaks and clears transient state on cancellation, focus loss and teardown.
+- See [D8 validation protocol](../backlog/RR-006-D8-integration-device-validation.md) for end-to-end integration, performance diagnostics and physical-device evidence requirements.
+
+## Determinism and authority
+
+- Commands are processed on the main gameplay thread.
+- No remote AI, network call, await or asynchronous service may be introduced into the input-to-gameplay path.
+- Only the router dispatches accepted semantic commands; movement/combat systems remain authoritative.
+- Headless timings are diagnostics, not physical-device latency or frame-time evidence.

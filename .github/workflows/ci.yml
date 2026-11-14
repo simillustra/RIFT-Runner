@@ -50,6 +50,10 @@ jobs:
         run: godot --headless --path . --script res://tests/mobile_input_context_controller_test.gd
       - name: Run RR-006 deterministic arbitration and buffering test suite
         run: godot --headless --path . --script res://tests/mobile_input_arbitration_d7_test.gd
+      - name: Run RR-006 D8 end-to-end integration test suite
+        run: godot --headless --path . --script res://tests/mobile_input_integration_d8_test.gd
+      - name: Run RR-006 D8 headless throughput diagnostic
+        run: godot --headless --path . --script res://tests/mobile_input_performance_d8_test.gd
       - name: Run RR-005 health component test suite
         run: godot --headless --path . --script res://tests/health_component_test.gd
       - name: Run RR-005 attack executor test suite
