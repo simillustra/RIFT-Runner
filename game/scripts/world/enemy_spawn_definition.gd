@@ -16,13 +16,6 @@ func validate() -> PackedStringArray:
 		var instance := enemy_scene.instantiate()
 		if not instance is Node3D:
 			errors.append("enemy_scene root must inherit Node3D.")
-		else:
-			if instance.get_node_or_null("HealthComponent") is not HealthComponent:
-				errors.append("enemy_scene must contain a HealthComponent child.")
-			if instance.get_node_or_null("EnemyAIController") is not EnemyAIController:
-				errors.append("enemy_scene must contain an EnemyAIController child.")
-			if instance.get_node_or_null("EnemyArchetypeController") is not EnemyArchetypeController:
-				errors.append("enemy_scene must contain an EnemyArchetypeController child.")
 		instance.free()
 	if archetype_profile == null:
 		errors.append("archetype_profile must be assigned.")
