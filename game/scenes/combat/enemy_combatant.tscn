@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/combat/health_component.gd" id="1_health"]
 [ext_resource type="Script" path="res://game/scripts/combat/attack_executor.gd" id="2_executor"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://game/scripts/combat/combat_reaction_controller.gd" id="6_reactions"]
 [ext_resource type="Script" path="res://game/scripts/ai/enemy_ai_controller.gd" id="7_ai"]
 [ext_resource type="Script" path="res://game/scripts/ai/enemy_perception_controller.gd" id="7_ai_perception"]
+[ext_resource type="Script" path="res://game/scripts/ai/enemy_chase_controller.gd" id="8_ai_chase"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.45
@@ -38,6 +39,13 @@ script = ExtResource("7_ai")
 
 [node name="EnemyPerceptionController" type="Node" parent="."]
 script = ExtResource("7_ai_perception")
+
+[node name="EnemyChaseController" type="Node" parent="."]
+script = ExtResource("8_ai_chase")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.5
+target_desired_distance = 1.8
 
 [node name="CombatReactionController" type="Node" parent="."]
 script = ExtResource("6_reactions")
