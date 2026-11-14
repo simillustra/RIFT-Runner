@@ -88,10 +88,10 @@ func _test_validation_and_context() -> void:
 	root.add_child(actor)
 	await process_frame
 	var router := actor.get_node("MobileInputRouter") as MobileInputRouter
-	var pause_count := 0
-	router.pause_requested.connect(func() -> void: pause_count += 1)
+	var pause_count: Array[int] = [0]
+	router.pause_requested.connect(func() -> void: pause_count[0] += 1)
 	var pause := _command(MobileInputAction.Action.PAUSE, MobileInputAction.Phase.PERFORMED, &"pause", 1)
-	_check(router.route_command(pause) == OK and pause_count == 1, "PAUSE emits an integration signal for game-state owner")
+	_check(router.route_command(pause) == OK and pause_count[0] == 1, "PAUSE emits an integration signal for game-state owner")
 	var interact := _command(MobileInputAction.Action.INTERACT, MobileInputAction.Phase.PERFORMED, &"interact", 1)
 	_check(router.route_command(interact) == ERR_UNAVAILABLE, "INTERACT is rejected without an interaction owner")
 	var duplicate := _command(MobileInputAction.Action.PAUSE, MobileInputAction.Phase.PERFORMED, &"pause", 1)
