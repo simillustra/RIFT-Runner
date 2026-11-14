@@ -109,8 +109,10 @@ func append_next_segment() -> Node3D:
 	_generated_segment_ids.append(selected.segment_id)
 	_last_definition = selected
 	_last_exit_socket = exit_socket
-	if segment.has_method("reset_from_pool"):
-		segment.call("reset_from_pool")
+	if bool(segment.get_meta("_pool_reused", false)):
+		if segment.has_method("reset_from_pool"):
+			segment.call("reset_from_pool")
+		segment.remove_meta("_pool_reused")
 	if segment.has_method("on_segment_activated"):
 		segment.call("on_segment_activated")
 	segment_spawned.emit(segment, selected)
@@ -237,6 +239,7 @@ func _acquire_segment(definition: WorldSegmentDefinition) -> Node3D:
 		segment.visible = true
 		segment.set_process(bool(segment.get_meta("_pool_original_process_enabled", true)))
 		segment.set_physics_process(bool(segment.get_meta("_pool_original_physics_enabled", true)))
+		segment.set_meta("_pool_reused", true)
 		return segment
 	var instance := definition.segment_scene.instantiate()
 	var segment := instance as Node3D
