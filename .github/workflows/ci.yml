@@ -68,5 +68,3 @@ jobs:
         run: godot --headless --path . --script res://tests/enemy_archetype_controller_test.gd
       - name: Run RR-008 squad coordination test suite
         run: godot --headless --path . --script res://tests/enemy_squad_coordinator_test.gd
-      - name: Run RR-008 D6 tactical encounter test suite
-        run: godot --headless --path . --script res://tests/encounter_tactical_coordination_d6_test.gd

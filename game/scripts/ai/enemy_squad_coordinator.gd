@@ -60,6 +60,17 @@ func get_member_role(member: Node3D) -> int:
 		return TacticalRole.PURSUER
 	return int(_role_by_member.get(member.get_instance_id(), TacticalRole.PURSUER))
 
+func has_member_claims(member: Node3D) -> bool:
+	if not is_instance_valid(member):
+		return false
+	var member_id := member.get_instance_id()
+	if _target_by_attacker.has(member_id) or _approach_by_member.has(member_id):
+		return true
+	for bucket: Array in _retreating_by_target.values():
+		if bucket.has(member_id):
+			return true
+	return false
+
 func get_role_count(role: int) -> int:
 	_cleanup_all()
 	return (_members_by_role.get(role, []) as Array).size()
@@ -139,6 +150,8 @@ func get_approach_position(member: Node3D, target: Node3D, role: int, preferred_
 	if not is_instance_valid(member) or not is_instance_valid(target):
 		return Vector3.ZERO
 	var member_id := member.get_instance_id()
+	if not _role_by_member.has(member_id):
+		return target.global_position
 	var target_id := target.get_instance_id()
 	var slot_index := -1
 	if _approach_by_member.has(member_id):
@@ -282,10 +295,11 @@ func _cleanup_all() -> void:
 	for role_key: Variant in _members_by_role.keys():
 		var members: Array = _members_by_role[role_key]
 		for index: int in range(members.size() - 1, -1, -1):
-			var member := instance_from_id(int(members[index])) as Node3D
+			var member_id := int(members[index])
+			var member := instance_from_id(member_id) as Node3D
 			if not is_instance_valid(member):
 				members.remove_at(index)
-				_role_by_member.erase(int(members[index]) if index < members.size() else -1)
+				_role_by_member.erase(member_id)
 		if members.is_empty():
 			_members_by_role.erase(role_key)
 		else:

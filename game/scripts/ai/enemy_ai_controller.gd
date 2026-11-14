@@ -32,6 +32,7 @@ var _squad_coordinator: EnemySquadCoordinator
 var _attack_slot_reserved: bool = false
 var _attack_retry_remaining: float = 0.0
 var _stagger_remaining: float = 0.0
+var _state_before_stagger: int = State.IDLE
 var _retreat_recovery_remaining: float = 0.0
 var _retreat_used: bool = false
 
@@ -58,6 +59,7 @@ func reset_for_spawn() -> void:
 	target = null
 	_attack_retry_remaining = 0.0
 	_stagger_remaining = 0.0
+	_state_before_stagger = State.IDLE
 	_retreat_recovery_remaining = 0.0
 	_retreat_used = false
 	_transition_to(State.IDLE)
@@ -75,6 +77,9 @@ func assign_squad_coordinator(coordinator: EnemySquadCoordinator, engagement_pol
 func has_squad_coordinator() -> bool:
 	return is_instance_valid(_squad_coordinator)
 
+func get_squad_coordinator() -> EnemySquadCoordinator:
+	return _squad_coordinator if is_instance_valid(_squad_coordinator) else null
+
 func set_target(next_target: Node3D) -> void:
 	if current_state == State.DEAD or not is_instance_valid(next_target):
 		return
@@ -89,7 +94,9 @@ func set_target(next_target: Node3D) -> void:
 		_transition_to(State.ALERT)
 
 func clear_target() -> void:
-	if target == null and not _attack_slot_reserved:
+	var actor := get_parent() as Node3D
+	var has_claims := is_instance_valid(_squad_coordinator) and actor != null and _squad_coordinator.has_member_claims(actor)
+	if target == null and not _attack_slot_reserved and not has_claims:
 		return
 	_release_tactical_target_claims()
 	if _executor != null:
@@ -103,6 +110,8 @@ func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 	if current_state == State.DEAD:
 		return
 	if staggered:
+		if current_state != State.STAGGERED:
+			_state_before_stagger = current_state
 		_stagger_remaining = maxf(duration_seconds, 0.0)
 		_release_attack_slot()
 		if _executor != null:
@@ -110,7 +119,12 @@ func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 		_transition_to(State.STAGGERED)
 	elif current_state == State.STAGGERED:
 		_stagger_remaining = 0.0
-		_transition_to(State.ALERT if is_instance_valid(target) else State.IDLE)
+		var resume_state := _state_before_stagger
+		if resume_state == State.DEAD or resume_state == State.STAGGERED:
+			resume_state = State.ALERT if is_instance_valid(target) else State.IDLE
+		if resume_state != State.RETREAT and is_instance_valid(target):
+			resume_state = State.ALERT
+		_transition_to(resume_state)
 
 func set_dead() -> void:
 	if current_state == State.DEAD:

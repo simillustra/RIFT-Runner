@@ -51,7 +51,13 @@ func _run() -> void:
 	var duplicate_pos := squad.get_approach_position(duplicate, player, d_ai.assigned_tactical_role, 3.0)
 	_check(duplicate_pos.distance_to(s_pos) > 0.5, "additional member does not reuse an occupied approach sector")
 	d_ai.clear_target()
-	_check(squad.get_approach_position(duplicate, player, d_ai.assigned_tactical_role, 3.0) != duplicate_pos, "target claim release permits sector reassignment")
+	var replacement := _make_enemy("Replacement")
+	world.add_child(replacement)
+	await process_frame
+	var replacement_ai := replacement.get_node("EnemyAIController") as EnemyAIController
+	replacement_ai.assign_squad_coordinator(squad, EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER)
+	var replacement_pos := squad.get_approach_position(replacement, player, replacement_ai.assigned_tactical_role, 3.0)
+	_check(replacement_pos.is_equal_approx(duplicate_pos), "released target sector can be reserved by another member")
 	_check(squad.request_attack_slot(pursuer, player), "attack reservation accepted")
 	_check(squad.get_active_attacker_count(player) == 1, "attack arbitration remains target-scoped")
 	p_ai.set_staggered(true, 0.2)

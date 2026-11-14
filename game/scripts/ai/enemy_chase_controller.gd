@@ -87,13 +87,7 @@ func _steer_to_destination(destination: Vector3, delta: float) -> Vector3:
 	return desired
 
 func _get_coordinator() -> EnemySquadCoordinator:
-	var actor := get_parent() as Node
-	if actor == null:
-		return null
-	var ai_node := actor.get_node_or_null("EnemyAIController") as EnemyAIController
-	if ai_node == null:
-		return null
-	return ai_node.get_squad_coordinator()
+	return _ai.get_squad_coordinator() if _ai != null else null
 
 func _apply_horizontal_velocity(desired: Vector3, delta: float) -> void:
 	var horizontal := Vector3(_actor.velocity.x, 0.0, _actor.velocity.z)
