@@ -28,7 +28,7 @@ func validate() -> PackedStringArray:
 	if drag_deadzone_px < 0.0:
 		errors.append("drag_deadzone_px cannot be negative.")
 	for action in [left_action, right_action, up_action, down_action]:
-		if action < MobileInputAction.Action.JUMP or action > MobileInputAction.Action.PAUSE:
+		if action < MobileInputAction.Action.JUMP or action > MobileInputAction.Action.PAUSE or action == MobileInputAction.Action.ABILITY_PRIMARY or action == MobileInputAction.Action.ABILITY_SECONDARY:
 			errors.append("direction bindings must use supported non-MOVE semantic actions.")
 			break
 	return errors
