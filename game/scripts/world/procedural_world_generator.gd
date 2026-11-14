@@ -233,7 +233,6 @@ func _acquire_segment(definition: WorldSegmentDefinition) -> Node3D:
 		_pool_by_definition[key] = bucket
 		_pooled_segment_count -= 1
 		_pool_root.remove_child(segment)
-		add_child(segment)
 		segment.process_mode = int(segment.get_meta("_pool_original_process_mode", Node.PROCESS_MODE_INHERIT))
 		segment.visible = true
 		segment.set_process(bool(segment.get_meta("_pool_original_process_enabled", true)))
