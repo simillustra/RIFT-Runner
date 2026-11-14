@@ -12,6 +12,7 @@ class_name TapPressGestureProfile
 @export var enable_hard_press: bool = false
 @export_range(0.0, 1.0, 0.01) var hard_press_pressure_threshold: float = 0.75
 @export var hard_press_action: int = MobileInputAction.Action.PAUSE
+@export var ability_id: StringName = &""
 
 
 func validate() -> PackedStringArray:
@@ -28,4 +29,7 @@ func validate() -> PackedStringArray:
 		if action <= MobileInputAction.Action.MOVE or action > MobileInputAction.Action.CANCEL:
 			errors.append("tap/press bindings must use supported non-MOVE semantic actions.")
 			break
+	var uses_ability := tap_action == MobileInputAction.Action.ABILITY_PRIMARY or tap_action == MobileInputAction.Action.ABILITY_SECONDARY or double_tap_action == MobileInputAction.Action.ABILITY_PRIMARY or double_tap_action == MobileInputAction.Action.ABILITY_SECONDARY or triple_tap_action == MobileInputAction.Action.ABILITY_PRIMARY or triple_tap_action == MobileInputAction.Action.ABILITY_SECONDARY or long_press_action == MobileInputAction.Action.ABILITY_PRIMARY or long_press_action == MobileInputAction.Action.ABILITY_SECONDARY or hard_press_action == MobileInputAction.Action.ABILITY_PRIMARY or hard_press_action == MobileInputAction.Action.ABILITY_SECONDARY
+	if uses_ability and ability_id == &"":
+		errors.append("ability_id is required when a tap/press binding is an ability action.")
 	return errors

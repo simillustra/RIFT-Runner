@@ -117,4 +117,9 @@ func _test_invalid_configuration() -> void:
 	recognizer.source_id = &"gesture_tap_press"
 	recognizer.gesture_profile.long_press_seconds = 0.0
 	_assert(not recognizer.is_enabled(), "invalid timing profile is rejected")
+	recognizer.gesture_profile.long_press_seconds = 0.55
+	recognizer.gesture_profile.tap_action = MobileInputAction.Action.ABILITY_PRIMARY
+	_assert(not recognizer.is_enabled(), "ability binding without an ability ID is rejected")
+	recognizer.gesture_profile.ability_id = &"bulwark"
+	_assert(recognizer.is_enabled(), "configured ability binding includes its required ability ID")
 	recognizer.queue_free()

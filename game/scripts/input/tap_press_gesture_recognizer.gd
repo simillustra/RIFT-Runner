@@ -195,6 +195,7 @@ func _emit_action(gesture: StringName, action: int) -> void:
 		command.mode = MobileInputAction.Mode.FREE_HAND
 		command.vector = Vector2.ZERO
 		command.strength = 1.0
+		command.ability_id = gesture_profile.ability_id
 		command.source_id = source_id
 		command.sequence_id = _sequence_id
 		if command.is_valid():
