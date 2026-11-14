@@ -1,6 +1,6 @@
 extends Resource
 class_name WorldSegmentDefinition
-## Authored modular world segment contract with connection and placement sockets.
+## Authored modular world segment contract with connection, gameplay and encounter sockets.
 @export var segment_id: StringName
 @export var theme_id: StringName
 @export_range(1.0, 1000.0, 0.1) var segment_length: float = 40.0
@@ -16,6 +16,7 @@ class_name WorldSegmentDefinition
 @export var obstacle_socket_paths: Array[NodePath] = []
 @export var traversal_socket_paths: Array[NodePath] = []
 @export var hazard_socket_paths: Array[NodePath] = []
+@export var encounter_spawn_socket_paths: Array[NodePath] = []
 
 func validate() -> PackedStringArray:
 	var errors := PackedStringArray()
@@ -32,9 +33,10 @@ func validate() -> PackedStringArray:
 		else:
 			if root.get_node_or_null(entry_socket_path) is not Marker3D: errors.append("entry_socket_path must resolve to a Marker3D.")
 			if root.get_node_or_null(exit_socket_path) is not Marker3D: errors.append("exit_socket_path must resolve to a Marker3D.")
-			_validate_placement_paths(root, obstacle_socket_paths, "obstacle", errors)
-			_validate_placement_paths(root, traversal_socket_paths, "traversal", errors)
-			_validate_placement_paths(root, hazard_socket_paths, "hazard", errors)
+			_validate_paths(root, obstacle_socket_paths, "obstacle", errors)
+			_validate_paths(root, traversal_socket_paths, "traversal", errors)
+			_validate_paths(root, hazard_socket_paths, "hazard", errors)
+			_validate_paths(root, encounter_spawn_socket_paths, "encounter spawn", errors)
 		instance.free()
 	if entry_connector_id == &"": errors.append("entry_connector_id must not be empty.")
 	if exit_connector_id == &"": errors.append("exit_connector_id must not be empty.")
@@ -53,13 +55,20 @@ func get_placement_sockets(segment_root: Node3D, category: StringName) -> Array[
 		&"traversal": paths = traversal_socket_paths
 		&"hazard": paths = hazard_socket_paths
 		_: return []
+	return _resolve_paths(segment_root, paths)
+
+func get_encounter_spawn_sockets(segment_root: Node3D) -> Array[Marker3D]:
+	return _resolve_paths(segment_root, encounter_spawn_socket_paths)
+
+func _resolve_paths(segment_root: Node3D, paths: Array[NodePath]) -> Array[Marker3D]:
 	var sockets: Array[Marker3D] = []
+	if segment_root == null or not is_instance_valid(segment_root): return sockets
 	for path: NodePath in paths:
 		var socket := segment_root.get_node_or_null(path) as Marker3D
 		if socket != null: sockets.append(socket)
 	return sockets
 
-func _validate_placement_paths(root: Node3D, paths: Array[NodePath], category: String, errors: PackedStringArray) -> void:
+func _validate_paths(root: Node3D, paths: Array[NodePath], category: String, errors: PackedStringArray) -> void:
 	for path: NodePath in paths:
 		if path.is_empty() or root.get_node_or_null(path) is not Marker3D:
 			errors.append("%s socket path '%s' must resolve to a Marker3D." % [category, String(path)])

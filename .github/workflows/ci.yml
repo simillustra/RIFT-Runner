@@ -52,11 +52,13 @@ jobs:
         run: godot --headless --path . --script res://tests/combat_encounter_validation_test.gd
       - name: Run RR-007 procedural world generator test suite
         run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
+      - name: Run RR-007 encounter spawn director test suite
+        run: godot --headless --path . --script res://tests/encounter_spawn_director_test.gd
       - name: Run RR-008 enemy AI controller test suite
         run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
-      - name: Run RR-007 placement socket test suite
-        run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
       - name: Run RR-008 enemy perception test suite
         run: godot --headless --path . --script res://tests/enemy_perception_test.gd
       - name: Run RR-008 chase steering test suite
         run: godot --headless --path . --script res://tests/enemy_chase_controller_test.gd
+      - name: Run RR-008 archetype policy test suite
+        run: godot --headless --path . --script res://tests/enemy_archetype_controller_test.gd
