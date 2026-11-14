@@ -14,6 +14,7 @@ func _run() -> void:
 	var floor_body := StaticBody3D.new()
 	floor_body.name = "PhysicsFixtureFloor"
 	var floor_shape := CollisionShape3D.new()
+	floor_shape.name = "FloorCollisionShape"
 	var floor_box := BoxShape3D.new()
 	floor_box.size = Vector3(30.0, 0.2, 30.0)
 	floor_shape.shape = floor_box
@@ -26,6 +27,7 @@ func _run() -> void:
 	actor.position = Vector3(0.0, 1.2, 0.0)
 	actor.floor_snap_length = 0.2
 	var actor_shape := CollisionShape3D.new()
+	actor_shape.name = "CharacterCollisionShape"
 	var capsule := CapsuleShape3D.new()
 	capsule.radius = 0.4
 	capsule.height = 1.8
@@ -39,8 +41,8 @@ func _run() -> void:
 	await process_frame
 
 	_check(controller.get_parent() == actor, "fixture uses a real CharacterBody3D owner")
-	_check(actor.get_node_or_null("CollisionShape3D") != null, "character fixture has a capsule collision shape")
-	_check(floor_body.get_node_or_null("CollisionShape3D") != null, "fixture has a static collision floor")
+	_check(actor.get_node_or_null("CharacterCollisionShape") != null, "character fixture has a capsule collision shape")
+	_check(floor_body.get_node_or_null("FloorCollisionShape") != null, "fixture has a static collision floor")
 	controller.grounded_changed.connect(_on_grounded_changed)
 
 	for _step in range(SETTLE_STEPS):
