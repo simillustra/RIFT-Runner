@@ -1,12 +1,18 @@
 extends SceneTree
-## RR-007 D2 tests for connector validation, socket alignment and seeded reproducibility.
+## RR-007 D3 tests for connector alignment and obstacle/traversal/hazard sockets.
 var failures: int = 0
 func _initialize() -> void:
 	call_deferred("_run")
 func _run() -> void:
 	var definition_a := _make_definition(&"city_a", 30.0, _make_segment_scene(30.0))
 	var definition_b := _make_definition(&"city_b", 45.0, _make_segment_scene(45.0))
-	_check(definition_a.validate().is_empty(), "segment with valid Marker3D sockets passes validation")
+	definition_a.obstacle_socket_paths = [NodePath("ObstacleSockets/Obstacle01")]
+	definition_a.traversal_socket_paths = [NodePath("TraversalSockets/Traversal01")]
+	definition_a.hazard_socket_paths = [NodePath("HazardSockets/Hazard01")]
+	definition_b.obstacle_socket_paths = [NodePath("ObstacleSockets/Obstacle01")]
+	definition_b.traversal_socket_paths = [NodePath("TraversalSockets/Traversal01")]
+	definition_b.hazard_socket_paths = [NodePath("HazardSockets/Hazard01")]
+	_check(definition_a.validate().is_empty(), "segment with connection and placement sockets validates")
 	_check(definition_b.can_follow(definition_a), "matching connector profile is compatible")
 	var incompatible := _make_definition(&"alien_gate", 35.0, _make_segment_scene(35.0))
 	incompatible.entry_connector_id = &"wide_gate"
@@ -31,6 +37,12 @@ func _run() -> void:
 		var previous_exit := generated[index - 1].get_node("ExitSocket") as Marker3D
 		var current_entry := generated[index].get_node("EntrySocket") as Marker3D
 		_check(previous_exit.global_transform.is_equal_approx(current_entry.global_transform), "adjacent segment sockets align exactly")
+	var obstacle_sockets := first.get_placement_sockets(generated[0], &"obstacle")
+	var traversal_sockets := first.get_placement_sockets(generated[0], &"traversal")
+	var hazard_sockets := first.get_placement_sockets(generated[0], &"hazard")
+	_check(obstacle_sockets.size() == 1, "obstacle placement socket is discoverable")
+	_check(traversal_sockets.size() == 1, "traversal placement socket is discoverable")
+	_check(hazard_sockets.size() == 1, "hazard placement socket is discoverable")
 	first.clear_generated_segments()
 	_check(first.get_generated_segment_count() == 0, "clear removes generated segment tracking")
 	_check(first.generate_initial_segments() == OK, "same seed can regenerate a sequence")
@@ -50,10 +62,10 @@ func _run() -> void:
 	await process_frame
 	_check(incompatible_only.generate_initial_segments() != OK, "generation fails safely when no compatible continuation exists")
 	if failures == 0:
-		print("RR-007 D2 socket compatibility: PASS")
+		print("RR-007 D3 placement sockets: PASS")
 		quit(0)
 	else:
-		push_error("RR-007 D2 socket compatibility: %d failure(s)" % failures)
+		push_error("RR-007 D3 placement sockets: %d failure(s)" % failures)
 		quit(1)
 func _make_segment_scene(length: float) -> PackedScene:
 	var root_node := Node3D.new()
@@ -66,6 +78,15 @@ func _make_segment_scene(length: float) -> PackedScene:
 	exit_socket.position = Vector3(0.0, 0.0, -length)
 	root_node.add_child(exit_socket)
 	exit_socket.owner = root_node
+	for socket_group: String in ["ObstacleSockets", "TraversalSockets", "HazardSockets"]:
+		var group_node := Node3D.new()
+		group_node.name = socket_group
+		root_node.add_child(group_node)
+		group_node.owner = root_node
+		var marker := Marker3D.new()
+		marker.name = socket_group.trim_suffix("Sockets").trim_suffix("s") + "01"
+		group_node.add_child(marker)
+		marker.owner = root_node
 	var packed := PackedScene.new()
 	var result := packed.pack(root_node)
 	root_node.free()

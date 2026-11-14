@@ -103,3 +103,11 @@ func get_generated_segment_ids() -> Array[StringName]:
 
 func get_last_exit_socket() -> Marker3D:
 	return _last_exit_socket
+
+func get_placement_sockets(segment: Node3D, category: StringName) -> Array[Marker3D]:
+	if segment == null or not is_instance_valid(segment): return []
+	var segment_id: StringName = segment.get_meta("segment_id", &"")
+	for definition: WorldSegmentDefinition in segment_definitions:
+		if definition != null and definition.segment_id == segment_id:
+			return definition.get_placement_sockets(segment, category)
+	return []

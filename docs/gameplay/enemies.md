@@ -1,10 +1,13 @@
 # Enemy Design
-**Owner:** RR-008. **Status:** D1 merged; D2 local perception in review.
+**Owner:** RR-008. **Status:** D1-D2 merged; D3 local chase steering and navigation adapter implemented, CI pending.
 
 Enemy behavior is deterministic, local and data-driven. Enemy brains never depend on remote inference or network availability. Combat delegates to RR-005; health/death remain owned by HealthComponent; hit reactions remain owned by CombatReactionController.
 
-## Initial state model
-IDLE → ALERT → CHASE → ATTACK, with interrupt states STAGGERED and terminal DEAD. D1 accepts an explicit target and uses configured distance thresholds. D2 adds local player-group scanning and nearest-valid-target selection. Locomotion and navigation remain later work.
+## State model
+IDLE → ALERT → CHASE → ATTACK, with interrupt states STAGGERED and terminal DEAD. Perception selects the nearest valid player target. EnemyAIController owns state transitions; EnemyChaseController owns CharacterBody3D horizontal steering while in CHASE.
+
+## Chase and navigation
+A configured NavigationAgent3D is used when it has a valid navigation map. Without one, direct steering provides a deterministic fallback but does not avoid walls or obstacles. The controller brakes inside preferred attack distance so the enemy does not continuously push into the player. RR-005 owns attack execution and damage.
 
 ## Vertical-slice archetypes
 Five archetypes are planned. Their detailed roles, attack patterns, telegraphs, counters, environment interactions and tuning remain to be authored before archetype implementation. Avoid encoding archetype-specific branches in the shared state machine; use later behavior policies/resources.
