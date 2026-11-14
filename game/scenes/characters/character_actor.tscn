@@ -1,7 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/characters/character_actor.gd" id="1_actor"]
 [ext_resource type="Script" path="res://game/scripts/characters/character_movement_controller.gd" id="2_movement"]
+[ext_resource type="Script" path="res://game/scripts/characters/character_animation_integration.gd" id="3_animation_integration"]
+[ext_resource type="Resource" path="res://game/resources/animation_profiles/base_humanoid_profile.tres" id="4_animation_profile"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_actor"]
 radius = 0.42
@@ -17,3 +19,7 @@ shape = SubResource("CapsuleShape3D_actor")
 
 [node name="MovementController" type="Node" parent="."]
 script = ExtResource("2_movement")
+
+[node name="AnimationIntegration" type="Node" parent="."]
+script = ExtResource("3_animation_integration")
+animation_profile = ExtResource("4_animation_profile")
