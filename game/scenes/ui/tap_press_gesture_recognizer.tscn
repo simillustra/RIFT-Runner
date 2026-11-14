@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/input/tap_press_gesture_recognizer.gd" id="1"]
+
+[node name="TapPressGestureRecognizer" type="Control"]
+custom_minimum_size = Vector2(160, 160)
+offset_right = 160.0
+offset_bottom = 160.0
+mouse_filter = 0
+script = ExtResource("1")

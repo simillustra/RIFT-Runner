@@ -1,2 +1,0 @@
-# Coding Agent Rules
-Root [AGENTS.md](../../AGENTS.md) is authoritative. Read the relevant backlog item and supporting docs before implementation. Work only within assigned RR scope; inspect repository state first; do not silently change product decisions, stat balance or service contracts. Add tests/docs. Never fabricate validation evidence. Do not start dependent tasks before predecessor acceptance. RR-003 is blocked until RR-002 CI validation follow-up is accepted.

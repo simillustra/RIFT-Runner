@@ -1,2 +1,0 @@
-# Error Handling
-Validate content at load/registration boundaries. Return Error codes or explicit result objects for expected failures. Log actionable context without swallowing errors. Missing optional save files mean first-run state; malformed/unsupported save versions are invalid data. Never log credentials or tokens. Network integrations require bounded timeouts, limited retries and offline fallback. Test null/invalid resources and duplicate identifiers.
