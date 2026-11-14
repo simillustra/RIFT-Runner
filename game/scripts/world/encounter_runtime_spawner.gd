@@ -166,7 +166,10 @@ func _configure_enemy(enemy: Node3D, definition: EnemySpawnDefinition, coordinat
 			push_warning("Could not apply archetype '%s' to spawned enemy." % String(definition.definition_id))
 	var ai := enemy.get_node_or_null("EnemyAIController") as EnemyAIController
 	if ai != null:
-		ai.assign_squad_coordinator(coordinator)
+		var policy := EnemyArchetypeProfile.EngagementPolicy.PURSUER
+		if definition.archetype_profile != null:
+			policy = definition.archetype_profile.engagement_policy
+		ai.assign_squad_coordinator(coordinator, policy)
 
 func _acquire_enemy(definition: EnemySpawnDefinition) -> Node3D:
 	_ensure_pool_root()
