@@ -1,6 +1,6 @@
 # RR-004 — Animation Framework Technical Design
 
-**Status:** D1-D6 implementation baseline; D7 validation outstanding  
+**Status:** D1-D6 implementation merged; D7 automated validation baseline in review; visual/device sign-off outstanding  
 **Engine:** Godot 4.4.1 · Typed GDScript  
 **Dependency:** RR-003 movement state contract
 
@@ -34,7 +34,7 @@ Owns authoritative velocity, grounded state, lane/free movement and movement mod
 
 ### CharacterAnimationIntegration
 - Resolves MovementController, AnimationTree, AnimationPlayer and AnimationProfile once in _ready().
-- If both animation nodes are absent, stays disabled without errors.
+- If both animation nodes are absent, stays disabled silently; CharacterActor and movement load normally.
 - If rig setup is partial or required configuration is missing, emits an actionable warning and remains disabled.
 - When configured, creates and owns a CharacterAnimationController and assigns typed references.
 - Never mutates CharacterBody3D or movement state.
@@ -53,7 +53,7 @@ A typed Resource mapping semantic states to clip identifiers, fallback clip and 
 
 Each hero profile shares the same semantic state and graph contract while retaining a distinct profile ID, rig profile ID and independently tunable locomotion parameters. Initial numeric values are balancing placeholders until D7 visual/device review.
 
-Current resources intentionally reference the canonical clip IDs `idle`, `move`, `rising`, `falling`, and `landing`. Production animation clips, hero-specific variations and retargeting compatibility are not yet verified. The rig profile IDs are compatibility labels, not proof that matching skeletons exist.
+Current resources intentionally reference the canonical clip IDs `idle`, `move`, `rising`, `falling`, and `landing`. Production animation clips, production skeletons and retargeting compatibility are not yet verified. The rig profile IDs are compatibility labels, not proof that matching skeletons exist.
 
 ## Fallback behavior
 
@@ -69,7 +69,8 @@ Current resources intentionally reference the canonical clip IDs `idle`, `move`,
 - D4 controller tests validate state selection and playback behavior.
 - D5 integration tests validate actor loading with and without animation nodes, adapter wiring and movement-state immutability.
 - D6 tests load and validate all three hero profile resources and check unique profile/rig identifiers.
-- D7 visual/device validation remains mandatory before RR-004 acceptance.
+- D7 automated asset-contract tests validate each hero profile against an AnimationPlayer fixture and verify generated graph clip references.
+- D7 manual visual/device evidence is tracked in `docs/qa/RR-004-D7-VALIDATION-MATRIX.md`; empty fixture clips are not visual proof.
 
 ## Milestones
 
@@ -81,4 +82,4 @@ Current resources intentionally reference the canonical clip IDs `idle`, `move`,
 | D4 Controller | Typed controller and locomotion mapping | Headless state tests pass |
 | D5 Integration | Animation-ready actor and no-rig fallback | Actor loads with/without rig |
 | D6 Hero profiles | Vanguard, Phantom, Cipher profiles | All profiles validate |
-| D7 Validation | Visual fixture, CI and device report | RR-004 acceptance checklist satisfied |
+| D7 Validation | Asset-contract CI plus production visual/device evidence | RR-004 acceptance checklist satisfied |
