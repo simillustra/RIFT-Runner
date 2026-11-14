@@ -1,7 +1,7 @@
 # Combat Design
 
 **Owner:** RR-005  
-**Status:** D1 health reception, D2 attack timing and D3 collision adapter implemented; D3 review pending.
+**Status:** D1 health, D2 attack execution and D3 collision adapter merged; D4 hero combat hooks in review.
 
 ## Combat principles
 
