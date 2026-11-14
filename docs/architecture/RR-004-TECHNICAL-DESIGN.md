@@ -1,6 +1,6 @@
 # RR-004 — Animation Framework Technical Design
 
-**Status:** Implementation baseline  
+**Status:** D1-D6 implementation baseline; D7 validation outstanding  
 **Engine:** Godot 4.4.1 · Typed GDScript  
 **Dependency:** RR-003 movement state contract
 
@@ -8,7 +8,7 @@
 
 1. Use Godot AnimationTree for runtime blending and AnimationPlayer for clip playback.
 2. Use a shared CharacterAnimationController Node for runtime orchestration.
-3. Use typed AnimationProfile Resources for rig-specific semantic clip mappings and tuning.
+3. Use typed AnimationProfile Resources for semantic clip mappings, rig compatibility identifiers and per-hero tuning.
 4. Animation is presentation only. It never applies movement, damage, hit confirmation, cooldowns or authoritative landing.
 5. Do not assume a production rig, skeleton hierarchy, retargeting setup or third-party animation pack.
 6. Expose movement through a read-only typed contract.
@@ -45,6 +45,16 @@ Reads the movement snapshot, converts world planar velocity into actor-local ble
 ### AnimationProfile
 A typed Resource mapping semantic states to clip identifiers, fallback clip and locomotion/playback tuning. Profiles contain data, not executable gameplay logic.
 
+## Hero profile assets
+
+- `vanguard_profile.tres`
+- `phantom_profile.tres`
+- `cipher_profile.tres`
+
+Each hero profile shares the same semantic state and graph contract while retaining a distinct profile ID, rig profile ID and independently tunable locomotion parameters. Initial numeric values are balancing placeholders until D7 visual/device review.
+
+Current resources intentionally reference the canonical clip IDs `idle`, `move`, `rising`, `falling`, and `landing`. Production animation clips, hero-specific variations and retargeting compatibility are not yet verified. The rig profile IDs are compatibility labels, not proof that matching skeletons exist.
+
 ## Fallback behavior
 
 - No AnimationTree and no AnimationPlayer: integration remains disabled silently; CharacterActor and movement load normally.
@@ -58,6 +68,7 @@ A typed Resource mapping semantic states to clip identifiers, fallback clip and 
 - Resource and graph tests validate profile mappings and centralized graph paths.
 - D4 controller tests validate state selection and playback behavior.
 - D5 integration tests validate actor loading with and without animation nodes, adapter wiring and movement-state immutability.
+- D6 tests load and validate all three hero profile resources and check unique profile/rig identifiers.
 - D7 visual/device validation remains mandatory before RR-004 acceptance.
 
 ## Milestones

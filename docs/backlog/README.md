@@ -1,13 +1,13 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance evidence is tracked separately. RR-004 is specified and may begin after RR-003's formal acceptance gate is satisfied.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance evidence is tracked separately. RR-004 D1-D5 are implemented and merged; D6 hero-specific profile assets are in review. D7 visual/device validation remains outstanding.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
 | RR-001 | Project Foundation | P0 | Accepted / merged |
 | RR-002 | Character Framework | P0 | Accepted / merged |
 | RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
-| RR-004 | Animation Framework | P0 | D1-D4 implemented; D5 integration in progress |
+| RR-004 | Animation Framework | P0 | D1-D5 merged; D6 hero profiles in review; D7 validation open |
 | RR-005 | Combat System | P0 | Not started |
 | RR-006 | Mobile Input | P0 | Not started |
 | RR-007 | Procedural World | P0 | Not started |
