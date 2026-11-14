@@ -2,7 +2,7 @@ name: Godot CI
 
 on:
   push:
-    branches: ["main", "rr-001/**", "rr-003/**", "docs/**"]
+    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "docs/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -24,3 +24,5 @@ jobs:
         run: godot --headless --path . --script res://tests/smoke_test.gd
       - name: Run movement test suite
         run: godot --headless --path . --script res://tests/movement_test.gd
+      - name: Run animation profile test suite
+        run: godot --headless --path . --script res://tests/animation_profile_test.gd
