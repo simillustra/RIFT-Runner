@@ -14,6 +14,9 @@ func _run() -> void:
 		return
 	var machine := CharacterAnimationGraph.create_state_machine(profile)
 	_check(machine != null, "state machine graph is created")
+	if machine == null:
+		quit(1)
+		return
 	var graph_errors := CharacterAnimationGraph.validate_state_machine(machine)
 	_check(graph_errors.is_empty(), "state machine graph passes structural validation")
 	var move_node := machine.get_node(CharacterAnimationGraph.STATE_MOVE) as AnimationNodeBlendSpace2D
@@ -21,7 +24,7 @@ func _run() -> void:
 	if move_node != null:
 		_check(move_node.get_blend_point_count() == 5, "Move blend space has idle and four directional points")
 		_check(move_node.get_blend_point_position(0).is_equal_approx(Vector2.ZERO), "blend point zero is idle center")
-	_check(machine.initial_node == String(CharacterAnimationGraph.STATE_IDLE), "Idle is the initial state")
+	_check(String(machine.start_node) == String(CharacterAnimationGraph.STATE_IDLE), "Idle is the start state")
 	_check(machine.has_node(CharacterAnimationGraph.STATE_JUMP_START), "JumpStart state exists")
 	_check(machine.has_node(CharacterAnimationGraph.STATE_RISING), "Rising state exists")
 	_check(machine.has_node(CharacterAnimationGraph.STATE_FALLING), "Falling state exists")
