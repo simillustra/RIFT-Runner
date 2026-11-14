@@ -26,6 +26,8 @@ jobs:
         run: godot --headless --path . --script res://tests/movement_test.gd
       - name: Run RR-003 deterministic physics fixture
         run: godot --headless --path . --script res://tests/movement_physics_fixture_test.gd
+      - name: Run RR-003 jump physics test suite
+        run: godot --headless --path . --script res://tests/movement_jump_physics_test.gd
       - name: Run animation profile test suite
         run: godot --headless --path . --script res://tests/animation_profile_test.gd
       - name: Run animation tree graph test suite

@@ -23,10 +23,10 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 ### A. Physics behavior
 
 - [x] Add deterministic physics-fixture tests using a real `CharacterBody3D` and a known floor/collision setup (D1 covers floor contact, grounded transitions, grounded downward-velocity resolution and airborne gravity).
-- [ ] Verify gravity increases downward velocity while airborne and does not accumulate downward velocity while grounded.
-- [ ] Verify a jump request while grounded produces the configured upward launch velocity within the documented test tolerance.
-- [ ] Verify a jump request while airborne is ignored and cannot trigger a second jump.
-- [ ] Verify landing restores grounded state and emits `grounded_changed` exactly on state transitions, not every physics frame.
+- [x] Verify gravity increases downward velocity while airborne and does not accumulate downward velocity while grounded (D2 adds deterministic real-physics assertions).
+- [x] Verify a jump request while grounded produces the configured upward launch velocity within the documented test tolerance (D2).
+- [x] Verify a jump request while airborne is ignored and cannot trigger a second jump (D2).
+- [x] Verify landing restores grounded state and emits `grounded_changed` exactly on state transitions, not every physics frame (D2).
 - [ ] Verify lane changes remain within bounds at both outer lanes and emit `lane_changed` only when the lane actually changes.
 - [ ] Verify lane movement converges on the expected lane center without overshooting.
 - [ ] Verify free movement is camera-relative, planar, normalized diagonally and reaches zero planar target velocity when intent is released.
@@ -52,7 +52,8 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Godot 4.4.1 editor import/class registration succeeds in CI.
 - [x] Headless foundation smoke test succeeds in CI run #15.
 - [x] Headless movement test script succeeds in CI run #15.
-- [ ] Pass the RR-003 D1 deterministic physics-fixture test in CI; broader jump, lane and free-movement physics assertions remain for subsequent acceptance steps.
+- [x] Pass the RR-003 D1 deterministic physics-fixture test in CI: [run #43649232438](https://github.com/simillustra/RIFT-Runner/actions/runs/43649232438).
+- [ ] Pass the RR-003 D2 jump/grounded physics test in CI; lane and free-movement physics assertions remain for subsequent acceptance steps.
 - [ ] Run the full CI suite on the final acceptance commit.
 
 ## 3. Acceptance decision

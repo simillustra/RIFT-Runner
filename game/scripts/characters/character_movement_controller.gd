@@ -127,6 +127,13 @@ func physics_step(delta: float) -> void:
 	if not is_grounded:
 		_actor.velocity.y -= gravity * delta
 
+	# Jump requests are consumed on the next physics tick. Only a grounded
+	# character may launch; airborne requests are discarded (no double jump).
+	if _jump_requested:
+		if is_grounded:
+			_actor.velocity.y = jump_velocity
+		_jump_requested = false
+
 	if _stagger_remaining > 0.0:
 		_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
 		_actor.velocity.x = _combat_impulse.x
