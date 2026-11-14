@@ -6,7 +6,7 @@ Coordinate complete enemy encounters using deterministic, local Godot decisions.
 ## Runtime ownership
 - `EnemySquadCoordinator` is instantiated once per runtime encounter by `EncounterRuntimeSpawner`.
 - Spawned enemies register in spawn order using their authored `EnemyArchetypeProfile.engagement_policy`. Role capacities and fallback order are deterministic.
-- The coordinator owns role membership, target-scoped attack slots, approach-sector reservations and retreat membership.
+- The coordinator owns role membership, target-scoped attack slots, approach-sector reservations and retreat membership. Its default approach radius is 1.5 m so pursuers remain inside the baseline melee attack envelope; authored skirmisher/ranged preferred distances expand that radius.
 - `EnemyAIController` owns local state transitions and timers. `EnemyChaseController` owns local steering and consumes the assigned approach position.
 - The spawner owns encounter lifetime. Pool release unregisters members and releases every claim before the enemy is detached; reuse resets AI state before registration in the new encounter.
 

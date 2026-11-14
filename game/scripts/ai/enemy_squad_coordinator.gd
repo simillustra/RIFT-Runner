@@ -13,7 +13,7 @@ enum TacticalRole { PURSUER, SKIRMISHER, RANGED }
 @export_range(1, 16, 1) var max_pursuers: int = 4
 @export_range(1, 8, 1) var max_skirmishers: int = 2
 @export_range(1, 8, 1) var max_ranged: int = 2
-@export_range(1.0, 20.0, 0.5) var approach_radius: float = 3.5
+@export_range(1.0, 20.0, 0.5) var approach_radius: float = 1.5
 @export_range(4, 16, 1) var approach_sector_count: int = 8
 
 var _role_by_member: Dictionary = {}
