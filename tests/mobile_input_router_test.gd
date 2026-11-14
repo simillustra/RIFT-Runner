@@ -52,9 +52,12 @@ func _test_hero_routing(path: String, expected_ability: StringName) -> void:
 	_check(router.route_command(move) == OK and movement._move_intent.is_equal_approx(Vector2(0.6, 0.8)), "MOVE PERFORMED reaches movement controller")
 	var competing := _command(MobileInputAction.Action.MOVE, MobileInputAction.Phase.PERFORMED, &"other_source", 1)
 	competing.vector = Vector2.RIGHT
-	_check(router.route_command(competing) == ERR_BUSY, "second movement source cannot overwrite active owner before D7 arbitration")
+	_check(router.route_command(competing) == OK, "second movement source is accepted by D7 arbitration")
+	_check(router.get_active_move_source() == &"other_source" and movement._move_intent.is_equal_approx(Vector2.RIGHT), "equal-priority sources use stable lexical tie-break")
+	var release_competing := _command(MobileInputAction.Action.MOVE, MobileInputAction.Phase.CANCELED, &"other_source", 2)
+	_check(router.route_command(release_competing) == OK and movement._move_intent.is_equal_approx(Vector2(0.6, 0.8)), "canceling winner restores remaining movement source")
 	var release := _command(MobileInputAction.Action.MOVE, MobileInputAction.Phase.CANCELED, &"test_move", 3)
-	_check(router.route_command(release) == OK and movement._move_intent.is_zero_approx(), "MOVE CANCELED neutralizes only its owning source")
+	_check(router.route_command(release) == OK and movement._move_intent.is_zero_approx(), "last MOVE source cancellation neutralizes movement")
 
 	var jump := _command(MobileInputAction.Action.JUMP, MobileInputAction.Phase.PERFORMED, &"jump", 1)
 	_check(router.route_command(jump) == OK and movement._jump_requested, "JUMP dispatches to movement request API")
