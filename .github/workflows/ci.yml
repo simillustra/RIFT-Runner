@@ -38,6 +38,8 @@ jobs:
         run: godot --headless --path . --script res://tests/animation_rig_validation_test.gd
       - name: Run RR-006 mobile input contract test suite
         run: godot --headless --path . --script res://tests/mobile_input_contract_test.gd
+      - name: Run RR-006 virtual joystick test suite
+        run: godot --headless --path . --script res://tests/virtual_joystick_test.gd
       - name: Run RR-005 health component test suite
         run: godot --headless --path . --script res://tests/health_component_test.gd
       - name: Run RR-005 attack executor test suite
