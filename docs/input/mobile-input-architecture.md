@@ -74,7 +74,17 @@ This table defines the translation boundary, not the final gesture grammar. Exac
 - Input commands are processed on the main gameplay thread. No remote calls, awaits, frame-delayed network responses or AI inference.
 - Input mode changes are atomic: cancel active commands from the old mode, neutralize movement, then enable the new mode.
 
-## Guided virtual joystick (D2)\n\n- `VirtualJoystick` is a reusable `Control` scene with a fixed center and radial knob.\n- It owns one pointer at a time; the first pointer to begin inside its rect owns the control until release/cancel. Additional fingers cannot steal it.\n- The output is a normalized Vector2: screen-right is +X and screen-up is +Y, matching the movement controller's local input convention.\n- Radial deadzone suppresses accidental drift; the knob clamps to the configured base radius and the output rescales the remaining travel to [0, 1].\n- It emits `MobileInputCommand` MOVE events with STARTED, PERFORMED and CANCELED phases, a stable source ID and monotonic sequence IDs. Release, focus loss and tree exit emit a zero-vector cancellation.\n- The joystick emits intent only. A later input router (D5/D7) will arbitrate sources and forward accepted MOVE commands to `CharacterMovementController.set_move_intent`.\n- The scene is deliberately unanchored; the HUD/layout milestone positions it for device safe areas.\n\n## Non-goals for D1/D2
+## Guided virtual joystick (D2)
+
+- `VirtualJoystick` is a reusable `Control` scene with a fixed center and radial knob.
+- It owns one pointer at a time; the first pointer to begin inside its rect owns the control until release/cancel. Additional fingers cannot steal it.
+- The output is a normalized Vector2: screen-right is +X and screen-up is +Y, matching the movement controller's local input convention.
+- Radial deadzone suppresses accidental drift; the knob clamps to the configured base radius and the output rescales the remaining travel to [0, 1].
+- It emits `MobileInputCommand` MOVE events with STARTED, PERFORMED and CANCELED phases, a stable source ID and monotonic sequence IDs. Release, focus loss and tree exit emit a zero-vector cancellation.
+- The joystick emits intent only. A later input router (D5/D7) will arbitrate sources and forward accepted MOVE commands to `CharacterMovementController.set_move_intent`.
+- The scene is deliberately unanchored; the HUD/layout milestone positions it for device safe areas.
+
+## Non-goals for D1/D2
 
 No joystick UI, gesture recognizer, input buffering, aim assist, haptics, settings screen, device-specific pressure dependency, gameplay dodge implementation or final gesture grammar.
 
