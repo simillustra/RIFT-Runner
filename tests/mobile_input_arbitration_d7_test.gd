@@ -32,7 +32,7 @@ func _run() -> void:
 	_check(router.route_command(attack) == OK and buffered[0] == 1 and router.get_buffered_command_count() == 1, "busy discrete action is buffered")
 	executor.cancel_attack()
 	router.advance_input_time(0.01)
-	_check(router.get_buffered_command_count() == 0 and executor.is_attack_active(), "buffer dispatches when available")
+	_check(router.get_buffered_command_count() == 0 and executor.is_active(), "buffer dispatches when available")
 	executor.cancel_attack()
 	_check(combat.execute_basic_attack() == OK, "expiry fixture locks executor")
 	var expired: Array[int] = [0]
