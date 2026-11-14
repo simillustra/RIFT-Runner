@@ -106,7 +106,8 @@ func set_member_retreating(member: Node3D, target: Node3D, retreating: bool) -> 
 
 func get_retreating_count(target: Node3D) -> int:
 	if not is_instance_valid(target): return 0
-	return (_retreating_by_target.get(target.get_instance_id(), {}) as Dictionary).size()
+	var members: Dictionary = _retreating_by_target.get(target.get_instance_id(), {})
+	return members.size()
 
 func _count_role(roles: Dictionary, role: int) -> int:
 	var count := 0

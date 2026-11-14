@@ -63,6 +63,7 @@ func set_target(next_target: Node3D) -> void:
 		if is_instance_valid(target): _squad_coordinator.set_member_retreating(get_parent() as Node3D, target, false)
 	if _executor != null: _executor.cancel_attack()
 	target = next_target
+	_retreat_triggered = false
 	if _squad_coordinator != null: assigned_squad_role = _squad_coordinator.assign_role(get_parent() as Node3D, target, int(preferred_squad_role))
 	target_changed.emit(target)
 	if current_state == State.IDLE:
@@ -99,6 +100,10 @@ func set_dead() -> void:
 	if current_state == State.DEAD:
 		return
 	_release_attack_slot()
+	if _squad_coordinator != null:
+		_squad_coordinator.release_role(get_parent() as Node3D)
+		if is_instance_valid(target):
+			_squad_coordinator.set_member_retreating(get_parent() as Node3D, target, false)
 	if _executor != null:
 		_executor.cancel_attack()
 	target = null
@@ -110,10 +115,9 @@ func update_decision(delta: float) -> void:
 	if delta <= 0.0 or current_state == State.DEAD:
 		return
 	if current_state == State.STAGGERED:
-		if _stagger_remaining > 0.0:
-			_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
-			if _stagger_remaining <= 0.0:
-				set_staggered(false)
+		_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
+		if _stagger_remaining <= 0.0:
+			set_staggered(false)
 		return
 	_attack_retry_remaining = maxf(_attack_retry_remaining - delta, 0.0)
 	if is_instance_valid(_health) and _health.is_dead:
