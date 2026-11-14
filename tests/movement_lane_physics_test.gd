@@ -69,6 +69,11 @@ func _run() -> void:
 			left_converged = true
 			break
 	_check(left_converged, "left lane movement converges on the exact outer lane center")
+	# move_and_slide() retains the velocity used for the final movement step.
+	# Observe one more physics tick so the controller can zero lateral velocity
+	# after it starts exactly at the requested lane center.
+	await physics_frame
+	_check(absf(actor.global_position.x - left_target) <= POSITION_TOLERANCE, "left lane position remains stable after convergence")
 	_check(absf(actor.velocity.x) <= POSITION_TOLERANCE, "lateral velocity settles at the left lane center")
 
 	# Move across the center to the right outer lane and check the opposite bound.
@@ -93,6 +98,8 @@ func _run() -> void:
 			right_converged = true
 			break
 	_check(right_converged, "right lane movement converges on the exact outer lane center")
+	await physics_frame
+	_check(absf(actor.global_position.x - right_target) <= POSITION_TOLERANCE, "right lane position remains stable after convergence")
 	_check(absf(actor.velocity.x) <= POSITION_TOLERANCE, "lateral velocity settles at the right lane center")
 
 	actor.queue_free()
