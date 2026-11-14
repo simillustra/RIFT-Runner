@@ -28,33 +28,18 @@ func _physics_process(delta: float) -> void:
 
 func update_steering(delta: float) -> Vector3:
 	if delta <= 0.0 or _actor == null or _ai == null: return Vector3.ZERO
-	if not is_instance_valid(_ai.target) or _ai.current_state == EnemyAIController.State.DEAD or _ai.current_state == EnemyAIController.State.STAGGERED:
+	if _ai.current_state != EnemyAIController.State.CHASE or not is_instance_valid(_ai.target):
 		_brake(delta)
 		return Vector3.ZERO
 	var target_position := _ai.target.global_position
-	if _ai.current_state == EnemyAIController.State.RETREAT:
-		var away := _actor.global_position - target_position
-		away.y = 0.0
-		away = away.normalized() if away.length_squared() > 0.0001 else -_actor.global_transform.basis.z
-		_face_direction(away, delta)
-		var retreat_velocity := away * move_speed
-		_apply_horizontal_velocity(retreat_velocity, delta)
-		return retreat_velocity
-	if _ai.current_state != EnemyAIController.State.CHASE:
-		_brake(delta)
-		return Vector3.ZERO
 	var offset := target_position - _actor.global_position
 	offset.y = 0.0
 	var distance := offset.length()
-	var is_flanker := _ai.assigned_squad_role == EnemyArchetypeProfile.SquadRole.FLANKER or engagement_policy == EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER
-	var is_support := _ai.assigned_squad_role == EnemyArchetypeProfile.SquadRole.SUPPORT
-	var hold_distance := maxf(preferred_attack_distance, _ai.attack_range * 1.2) if is_support else preferred_attack_distance
-	if distance <= hold_distance + stopping_tolerance:
+	if distance <= preferred_attack_distance + stopping_tolerance:
 		_face_direction(offset, delta)
-		if is_flanker and distance > 0.1:
+		if engagement_policy == EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER and distance > 0.1:
 			var tangent := Vector3(-offset.z, 0.0, offset.x).normalized()
-			var side := 1.0 if (_actor.get_instance_id() % 2) == 0 else -1.0
-			var desired_strafe := tangent * move_speed * strafe_speed_ratio * side
+			var desired_strafe := tangent * move_speed * strafe_speed_ratio
 			_apply_horizontal_velocity(desired_strafe, delta)
 			return desired_strafe
 		_brake(delta)

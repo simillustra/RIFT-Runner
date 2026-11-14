@@ -4,9 +4,7 @@ class_name EnemyAIController
 signal state_changed(previous_state: int, current_state: int)
 signal target_changed(target: Node3D)
 signal attack_requested
-signal retreat_started(target: Node3D)
-signal retreat_ended(target: Node3D)
-enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, RETREAT, DEAD }
+enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, DEAD }
 @export var health_component_path: NodePath = NodePath("../HealthComponent")
 @export var enemy_combat_controller_path: NodePath = NodePath("../EnemyCombatController")
 @export var combat_reaction_controller_path: NodePath = NodePath("../CombatReactionController")
@@ -16,11 +14,6 @@ enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, RETREAT, DEAD }
 @export_range(0.5, 100.0, 0.1) var attack_range: float = 2.0
 @export_range(0.5, 150.0, 0.1) var lose_target_range: float = 18.0
 @export_range(0.05, 2.0, 0.01) var failed_attack_retry_seconds: float = 0.25
-@export_range(0.0, 0.9, 0.05) var retreat_health_ratio: float = 0.0
-@export_range(1.0, 30.0, 0.5) var retreat_distance: float = 8.0
-@export var preferred_squad_role: EnemyArchetypeProfile.SquadRole = EnemyArchetypeProfile.SquadRole.ASSAULT
-var assigned_squad_role: int = EnemyArchetypeProfile.SquadRole.ASSAULT
-var _retreat_triggered: bool = false
 var current_state: int = State.IDLE
 var target: Node3D
 var _health: HealthComponent
@@ -58,13 +51,9 @@ func set_target(next_target: Node3D) -> void:
 	if target == next_target:
 		return
 	_release_attack_slot()
-	if _squad_coordinator != null:
-		_squad_coordinator.release_role(get_parent() as Node3D)
-		if is_instance_valid(target): _squad_coordinator.set_member_retreating(get_parent() as Node3D, target, false)
-	if _executor != null: _executor.cancel_attack()
+	if _executor != null:
+		_executor.cancel_attack()
 	target = next_target
-	_retreat_triggered = false
-	if _squad_coordinator != null: assigned_squad_role = _squad_coordinator.assign_role(get_parent() as Node3D, target, int(preferred_squad_role))
 	target_changed.emit(target)
 	if current_state == State.IDLE:
 		_transition_to(State.ALERT)
@@ -72,12 +61,9 @@ func set_target(next_target: Node3D) -> void:
 func clear_target() -> void:
 	if target == null:
 		return
-	var previous_target := target
 	_release_attack_slot()
-	if _squad_coordinator != null:
-		_squad_coordinator.release_role(get_parent() as Node3D)
-		_squad_coordinator.set_member_retreating(get_parent() as Node3D, previous_target, false)
-	if _executor != null: _executor.cancel_attack()
+	if _executor != null:
+		_executor.cancel_attack()
 	target = null
 	target_changed.emit(null)
 	if current_state != State.DEAD and current_state != State.STAGGERED:
@@ -100,10 +86,6 @@ func set_dead() -> void:
 	if current_state == State.DEAD:
 		return
 	_release_attack_slot()
-	if _squad_coordinator != null:
-		_squad_coordinator.release_role(get_parent() as Node3D)
-		if is_instance_valid(target):
-			_squad_coordinator.set_member_retreating(get_parent() as Node3D, target, false)
 	if _executor != null:
 		_executor.cancel_attack()
 	target = null
@@ -115,9 +97,10 @@ func update_decision(delta: float) -> void:
 	if delta <= 0.0 or current_state == State.DEAD:
 		return
 	if current_state == State.STAGGERED:
-		_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
-		if _stagger_remaining <= 0.0:
-			set_staggered(false)
+		if _stagger_remaining > 0.0:
+			_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
+			if _stagger_remaining <= 0.0:
+				set_staggered(false)
 		return
 	_attack_retry_remaining = maxf(_attack_retry_remaining - delta, 0.0)
 	if is_instance_valid(_health) and _health.is_dead:
@@ -127,14 +110,6 @@ func update_decision(delta: float) -> void:
 		clear_target()
 		return
 	var distance := _get_target_distance()
-	if current_state == State.RETREAT:
-		if distance >= retreat_distance: _finish_retreat()
-		return
-	if retreat_health_ratio > 0.0 and is_instance_valid(_health):
-		if _health.get_health_ratio() <= retreat_health_ratio and not _retreat_triggered:
-			_begin_retreat()
-			return
-		elif _health.get_health_ratio() > retreat_health_ratio + 0.1: _retreat_triggered = false
 	if distance > lose_target_range:
 		clear_target()
 		return
@@ -157,21 +132,6 @@ func _get_target_distance() -> float:
 	if actor == null or not is_instance_valid(target):
 		return INF
 	return actor.global_position.distance_to(target.global_position)
-
-func _begin_retreat() -> void:
-	_retreat_triggered = true
-	_release_attack_slot()
-	if _executor != null: _executor.cancel_attack()
-	if _squad_coordinator != null: _squad_coordinator.set_member_retreating(get_parent() as Node3D, target, true)
-	_transition_to(State.RETREAT)
-	retreat_started.emit(target)
-
-func _finish_retreat() -> void:
-	var previous_target := target
-	if _squad_coordinator != null and is_instance_valid(previous_target):
-		_squad_coordinator.set_member_retreating(get_parent() as Node3D, previous_target, false)
-	_transition_to(State.ALERT)
-	retreat_ended.emit(previous_target)
 
 func _try_request_attack() -> void:
 	if _attack_retry_remaining > 0.0 or _combat == null:

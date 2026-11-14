@@ -20,16 +20,17 @@ func _run() -> void:
 	var x := extra.get_node("EnemyAIController") as EnemyAIController
 	ai.set_target(target); f.set_target(target); x.set_target(target)
 	_check(f.assigned_squad_role == 1 and x.assigned_squad_role == 0, "role capacity and deterministic fallback")
-	var moving_flanker := _make_enemy("MovingFlanker", EnemyArchetypeProfile.SquadRole.FLANKER)
-	world.add_child(moving_flanker)
-	await process_frame
-	var moving_ai := moving_flanker.get_node("EnemyAIController") as EnemyAIController
-	var moving_chase := moving_flanker.get_node("EnemyChaseController") as EnemyChaseController
-	moving_ai.set_target(target)
-	moving_ai.current_state = EnemyAIController.State.CHASE
-	moving_ai.attack_range = 1.0
-	moving_chase.preferred_attack_distance = 3.0
-	_check(absf(moving_chase.update_steering(0.1).x) > 0.01, "flanker role produces lateral repositioning")
+	# Reuse the flanker that successfully reserved the role above. The extra
+	# flanker correctly fell back to ASSAULT because the role capacity is one.
+	# Put the assigned flanker inside its preferred engagement radius so the
+	# steering controller exercises lateral repositioning rather than approach.
+	var flanker_chase := flanker.get_node("EnemyChaseController") as EnemyChaseController
+	flanker.position = Vector3(0.0, 0.0, -7.0)
+	f.current_state = EnemyAIController.State.CHASE
+	f.attack_range = 1.0
+	flanker_chase.preferred_attack_distance = 3.0
+	_check(f.assigned_squad_role == EnemyArchetypeProfile.SquadRole.FLANKER, "movement fixture retains flanker role reservation")
+	_check(absf(flanker_chase.update_steering(0.1).x) > 0.01, "flanker role produces lateral repositioning")
 	var support := _make_enemy("Support", EnemyArchetypeProfile.SquadRole.SUPPORT)
 	world.add_child(support)
 	await process_frame
