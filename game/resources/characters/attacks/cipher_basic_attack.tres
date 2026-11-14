@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="AttackDefinition" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/combat/attack_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+attack_id = &"cipher_pulse"
+display_name = "Pulse Strike"
+description = "A balanced energy-infused strike."
+damage = 18.0
+damage_type = &"energy"
+startup_seconds = 0.16
+active_seconds = 0.2
+recovery_seconds = 0.34
+cooldown_seconds = 0.15
+tags = PackedStringArray("basic", "energy", "cipher")
