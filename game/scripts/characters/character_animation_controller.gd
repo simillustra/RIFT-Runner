@@ -12,7 +12,8 @@ class_name CharacterAnimationController
 @export_range(0.05, 2.0, 0.01) var hit_react_default_seconds: float = 0.35
 
 var _playback: AnimationNodeStateMachinePlayback
-var _was_grounded: bool = true
+var _was_grounded: bool = false
+var _has_grounded_sample: bool = false
 var _jump_start_remaining: float = 0.0
 var _landing_remaining: float = 0.0
 var _hit_react_remaining: float = 0.0
@@ -37,7 +38,6 @@ func _ready() -> void:
 		push_error("CharacterAnimationController could not create its AnimationTree graph.")
 		return
 	animation_tree.active = true
-	_was_grounded = movement_controller.get_animation_state().is_grounded
 	_initialized = true
 
 
@@ -78,6 +78,10 @@ func update_animation(delta: float) -> void:
 		return
 
 	var snapshot := movement_controller.get_animation_state()
+	# The first observation establishes a baseline; it is not a landing/jump edge.
+	if not _has_grounded_sample:
+		_was_grounded = snapshot.is_grounded
+		_has_grounded_sample = true
 	var planar_speed := snapshot.planar_velocity.length()
 	var move_direction := _get_actor_local_move_direction(snapshot)
 
@@ -102,7 +106,8 @@ func _select_state(snapshot: CharacterAnimationState, planar_speed: float, delta
 			return CharacterAnimationGraph.STATE_JUMP_START
 		if _jump_start_remaining > 0.0:
 			_jump_start_remaining = maxf(_jump_start_remaining - delta, 0.0)
-			return CharacterAnimationGraph.STATE_JUMP_START
+			if _jump_start_remaining > 0.0:
+				return CharacterAnimationGraph.STATE_JUMP_START
 		return CharacterAnimationGraph.STATE_RISING if snapshot.vertical_velocity > 0.0 else CharacterAnimationGraph.STATE_FALLING
 
 	_jump_start_remaining = 0.0
