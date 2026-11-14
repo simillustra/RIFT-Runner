@@ -109,6 +109,10 @@ func get_stagger_remaining() -> float:
 	return _stagger_remaining
 
 
+func get_combat_impulse() -> Vector3:
+	return _combat_impulse
+
+
 func _physics_process(delta: float) -> void:
 	physics_step(delta)
 

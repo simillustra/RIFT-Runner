@@ -42,7 +42,7 @@ func _run() -> void:
 	_check(hit_reacted_count[0] == 1, "accepted damage emits one hit-reaction presentation event")
 	_check(stagger_count[0] == 1, "accepted damage requests a stagger window")
 	_check(knockback_count[0] == 1, "accepted damage produces a knockback impulse")
-	_check(actor.velocity.x > 0.0, "source position determines outward knockback direction")
+	_check(movement.get_combat_impulse().x > 0.0, "source position determines outward knockback direction")
 	_check(movement.get_stagger_remaining() > 0.0, "movement controller owns the stagger lock")
 	_check(reactions.get_fallback_stagger_remaining() == 0.0, "character movement path does not create a second stagger timer")
 
