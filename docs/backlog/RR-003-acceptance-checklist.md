@@ -43,6 +43,7 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Pass the RR-003 D3 lane boundary/convergence physics test in CI: [run #43650468004](https://github.com/simillustra/RIFT-Runner/actions/runs/43650468004).
 - [ ] Pass the RR-003 D4 camera-relative free-movement physics test in CI: [run #43651408510](https://github.com/simillustra/RIFT-Runner/actions/runs/43651408510) — pending.
 - [ ] Pass the RR-003 D5 invalid delta/configuration/ownership safety test in CI.
+- [ ] Pass the RR-003 D7 movement validation recorder test in CI.
 - [ ] Run the full CI suite on the final acceptance commit.
 
 ### B. Character and scene integration
@@ -54,6 +55,9 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Confirm controller does not own input polling, camera rig behavior, animation playback, combat or ability execution (verified by the movement controller integration boundary; gameplay remains driven through explicit intent APIs).
 
 ### C. Mobile validation
+
+- [x] Add a device-session recorder for OS/model/renderer, frame pacing and movement-state evidence (D7; automated contract test).
+- [ ] Execute the documented D7 protocol on the required physical Android devices and attach JSON reports and recordings.
 
 - [ ] Run a playable movement test on at least one supported low/mid-tier Android device and one target high-tier Android device.
 - [ ] Record device model, OS, renderer, frame rate, test duration and any movement defects.

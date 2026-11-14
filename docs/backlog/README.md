@@ -1,6 +1,6 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning merged. RR-008 D1-D6 encounter-level tactical coordination are merged; gameplay/device validation remains open.
+RR-001 and RR-002 are accepted and merged. RR-003 D1-D7 implementation is in progress; device validation and final integration acceptance remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning merged. RR-008 D1-D6 encounter-level tactical coordination are merged; gameplay/device validation remains open.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
