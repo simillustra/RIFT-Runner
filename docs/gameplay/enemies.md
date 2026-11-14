@@ -1,10 +1,10 @@
 # Enemy Design
-**Owner:** RR-008. **Status:** D1 foundation in review.
+**Owner:** RR-008. **Status:** D1 merged; D2 local perception in review.
 
 Enemy behavior is deterministic, local and data-driven. Enemy brains never depend on remote inference or network availability. Combat delegates to RR-005; health/death remain owned by HealthComponent; hit reactions remain owned by CombatReactionController.
 
 ## Initial state model
-IDLE → ALERT → CHASE → ATTACK, with interrupt states STAGGERED and terminal DEAD. D1 accepts an explicit target and uses configured distance thresholds. It does not yet implement perception, target selection, locomotion or navigation.
+IDLE → ALERT → CHASE → ATTACK, with interrupt states STAGGERED and terminal DEAD. D1 accepts an explicit target and uses configured distance thresholds. D2 adds local player-group scanning and nearest-valid-target selection. Locomotion and navigation remain later work.
 
 ## Vertical-slice archetypes
 Five archetypes are planned. Their detailed roles, attack patterns, telegraphs, counters, environment interactions and tuning remain to be authored before archetype implementation. Avoid encoding archetype-specific branches in the shared state machine; use later behavior policies/resources.
