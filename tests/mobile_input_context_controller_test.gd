@@ -25,6 +25,7 @@ func _run() -> void:
 	await process_frame
 	var router := actor.get_node("MobileInputRouter") as MobileInputRouter
 	var movement := actor.get_node("MovementController") as CharacterMovementController
+	movement.movement_mode = CharacterMovementController.MovementMode.FREE
 
 	var joystick := VirtualJoystick.new()
 	joystick.size = Vector2(160.0, 160.0)
