@@ -2,7 +2,7 @@ name: Godot CI
 
 on:
   push:
-    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-008/**", "feat/rr-007-008*", "docs/**"]
+    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-007-*", "feat/rr-008/**", "feat/rr-007-008*", "docs/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -56,6 +56,8 @@ jobs:
         run: godot --headless --path . --script res://tests/encounter_spawn_director_test.gd
       - name: Run RR-007 runtime streaming and pooling test suite
         run: godot --headless --path . --script res://tests/world_streaming_pool_test.gd
+      - name: Run RR-007 runtime encounter spawner test suite
+        run: godot --headless --path . --script res://tests/encounter_runtime_spawner_test.gd
       - name: Run RR-008 enemy AI controller test suite
         run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
       - name: Run RR-008 enemy perception test suite

@@ -1,6 +1,6 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 are merged; D5.1 runtime streaming and pooling is in implementation. RR-008 D1-D4 are merged; D5 advanced enemy behavior is next.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning is in implementation. RR-008 D1-D4 and D5 per-target attack-slot arbitration are merged; tactical retreat and broader group coordination remain open.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
@@ -10,8 +10,8 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-004 | Animation Framework | P0 | D1-D6 and D7 automated baseline merged; visual/device sign-off open |
 | RR-005 | Combat System | P0 | D1-D7 merged; device and encounter sign-off open |
 | RR-006 | Mobile Input | P0 | Not started |
-| RR-007 | Procedural World | P0 | D1-D4 merged; D5.1 runtime streaming and pooling in implementation |
-| RR-008 | Enemy AI | P0 | D1-D4 merged; D5 squad attack coordination in implementation |
+| RR-007 | Procedural World | P0 | D1-D4 and D5.1 runtime streaming/pooling merged; D5.3 runtime enemy spawning in implementation |
+| RR-008 | Enemy AI | P0 | D1-D4 and D5 per-target attack-slot arbitration merged; retreat/tactical group coordination open |
 | RR-009 | Progression and Rewards | P0 | Not started |
 | RR-010 | UI/UX and HUD | P0 | Not started |
 | RR-011 | Audio and VFX | P0 | Not started |
