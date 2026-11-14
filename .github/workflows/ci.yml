@@ -40,3 +40,5 @@ jobs:
         run: godot --headless --path . --script res://tests/health_component_test.gd
       - name: Run RR-005 attack executor test suite
         run: godot --headless --path . --script res://tests/attack_executor_test.gd
+      - name: Run RR-005 collision hit detection test suite
+        run: godot --headless --path . --script res://tests/combat_hit_detection_test.gd
