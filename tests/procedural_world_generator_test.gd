@@ -44,8 +44,8 @@ func _run() -> void:
 	_check(second.generate_initial_segments() == OK, "second generator creates seeded sequence")
 	_check(second.get_generated_segment_ids() == first_ids, "independent generators reproduce the same seeded sequence")
 	var incompatible_only := ProceduralWorldGenerator.new()
-	incompatible_only.segment_definitions = [definition_a, incompatible]
-	incompatible_only.initial_segment_count = 3
+	incompatible_only.segment_definitions = [incompatible]
+	incompatible_only.initial_segment_count = 2
 	root.add_child(incompatible_only)
 	await process_frame
 	_check(incompatible_only.generate_initial_segments() != OK, "generation fails safely when no compatible continuation exists")
