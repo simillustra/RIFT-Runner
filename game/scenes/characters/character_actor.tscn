@@ -1,10 +1,12 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/characters/character_actor.gd" id="1_actor"]
 [ext_resource type="Script" path="res://game/scripts/characters/character_movement_controller.gd" id="2_movement"]
 [ext_resource type="Script" path="res://game/scripts/characters/character_animation_integration.gd" id="3_animation_integration"]
 [ext_resource type="Resource" path="res://game/resources/animation_profiles/base_humanoid_profile.tres" id="4_animation_profile"]
 [ext_resource type="Script" path="res://game/scripts/combat/health_component.gd" id="5_health"]
+[ext_resource type="Script" path="res://game/scripts/combat/attack_executor.gd" id="6_attack_executor"]
+[ext_resource type="Script" path="res://game/scripts/combat/hero_combat_controller.gd" id="7_hero_combat"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_actor"]
 radius = 0.42
@@ -27,3 +29,9 @@ animation_profile = ExtResource("4_animation_profile")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("5_health")
+
+[node name="AttackExecutor" type="Node" parent="."]
+script = ExtResource("6_attack_executor")
+
+[node name="HeroCombatController" type="Node" parent="."]
+script = ExtResource("7_hero_combat")

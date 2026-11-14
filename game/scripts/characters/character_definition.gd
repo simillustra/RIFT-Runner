@@ -1,12 +1,13 @@
 extends Resource
 class_name CharacterDefinition
-## Data-driven character identity, stats, and ability metadata.
+## Data-driven character identity, stats, basic combat move and ability metadata.
 
 @export var character_id: StringName = &""
 @export var display_name: String = ""
 @export var archetype: StringName = &""
 @export_multiline var description: String = ""
 @export var stats: CharacterStats
+@export var basic_attack: AttackDefinition
 @export var abilities: Array[AbilityDefinition] = []
 
 
@@ -22,6 +23,8 @@ func validate() -> PackedStringArray:
 		errors.append("stats resource is required.")
 	else:
 		errors.append_array(stats.validate())
+	if basic_attack != null:
+		errors.append_array(basic_attack.validate())
 
 	var seen_ability_ids: Dictionary = {}
 	for index: int in range(abilities.size()):
