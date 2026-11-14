@@ -1,7 +1,7 @@
 # Combat Design
 
 **Owner:** RR-005  
-**Status:** D1-D4 merged; D5 CI passed and is in review; D6 hit-reaction implementation in review.
+**Status:** D1-D6 merged; D7 deterministic encounter regression and mobile validation baseline in review.
 
 ## Combat principles
 
@@ -42,6 +42,10 @@ Vanguard, Phantom and Cipher define basic attacks and signature ability metadata
 - D1 death marks movement dead, cancels D2 attacks, disables collision shapes and disables D3 hurtboxes. A death presentation signal is emitted for future visual/audio assets.
 - D6 does not apply damage, choose targets or implement enemy AI.
 
-## Planned
+### Combat tuning and encounter validation (D7)
 
-- D7: combat tuning, mobile performance and end-to-end encounter validation.
+- `tests/combat_encounter_validation_test.gd` simulates Vanguard, Phantom and Cipher against a fixed 100 HP target using the actual authored attack resources and D1/D2 runtime components.
+- The test guards startup damage, attack-cycle completion, expected hit count and deterministic simulated time-to-kill.
+- Baseline TTK is 5.30 s Vanguard, 3.20 s Phantom and 5.10 s Cipher. These are regression values, not final balance sign-off.
+- Mobile frame-time and combat CPU budgets plus the manual device/encounter evidence protocol are recorded in `docs/backlog/RR-005-D7-combat-validation.md`.
+- Headless CI does not substitute for Android/iOS device profiling or visual encounter sign-off.
