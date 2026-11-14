@@ -16,6 +16,8 @@ signal death_presented
 @export_range(0.0, 30.0, 0.1) var knockback_strength: float = 4.0
 @export_range(0.0, 10.0, 0.1) var vertical_knockback: float = 1.0
 @export var disable_collision_on_death: bool = true
+@export_range(0.1, 40.0, 0.1) var fallback_impulse_decay: float = 14.0
+@export_range(0.1, 40.0, 0.1) var fallback_gravity: float = 18.0
 
 var _health: HealthComponent
 var _movement: CharacterMovementController
@@ -53,7 +55,16 @@ func _physics_process(delta: float) -> void:
 	_fallback_stagger_remaining = maxf(_fallback_stagger_remaining - delta, 0.0)
 	var body := _actor as CharacterBody3D
 	if body != null:
+		body.velocity.x = move_toward(body.velocity.x, 0.0, fallback_impulse_decay * delta)
+		body.velocity.z = move_toward(body.velocity.z, 0.0, fallback_impulse_decay * delta)
+		if not body.is_on_floor():
+			body.velocity.y -= fallback_gravity * delta
+		else:
+			body.velocity.y = 0.0
 		body.move_and_slide()
+		if _fallback_stagger_remaining <= 0.0:
+			body.velocity.x = 0.0
+			body.velocity.z = 0.0
 
 
 func _on_damaged(applied_damage: float, _remaining_health: float, source: Node, damage_type: StringName) -> void:

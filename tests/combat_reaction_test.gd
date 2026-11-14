@@ -51,13 +51,14 @@ func _run() -> void:
 	executor.begin_attack(_make_attack(), actor)
 	_check(not executor.is_ready(), "fixture starts an attack before lethal damage")
 	health.apply_damage(1000.0, source, &"physical")
+	await process_frame
 	_check(health.is_dead, "D1 remains authoritative for death")
 	_check(reactions.is_dead(), "death presentation is entered exactly once")
 	_check(movement.is_dead, "dead actor movement is disabled")
 	_check(executor.is_ready(), "death cancels any active attack executor")
 	var body_shape := actor.get_node("CollisionShape3D") as CollisionShape3D
 	_check(body_shape.disabled, "death presentation disables the actor collision shape")
-	_check(not reactions.is_dead() == false, "death state remains terminal")
+	_check(reactions.is_dead(), "death state remains terminal")
 
 	actor.queue_free()
 	source.queue_free()
