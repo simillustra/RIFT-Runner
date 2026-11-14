@@ -72,25 +72,25 @@ func _run() -> void:
 	movement.set_move_intent(Vector2.RIGHT)
 	var initial_y := actor.global_position.y
 	var highest_y := initial_y
+	var wall_contact := false
 	for _step in range(PHYSICS_STEPS):
 		await physics_frame
 		highest_y = maxf(highest_y, actor.global_position.y)
-		if actor.global_position.x >= WALL_CENTER_X - 0.65:
+		if actor.is_on_wall():
+			wall_contact = true
 			break
 
 	_check(highest_y > initial_y + 0.25, "production actor climbs the collision-backed slope")
+	_check(wall_contact, "production CharacterBody3D reports contact with the vertical wall")
 	_check(actor.global_position.x < WALL_CENTER_X - 0.25, "production capsule is blocked by the arena wall")
 	_check(actor.is_on_floor() and movement.is_grounded, "production actor retains grounded contact on the slope")
-	# Velocity records the requested movement for the physics step and is not a
-	# reliable collision assertion on its own. Keep intent active and verify the
-	# solver reports wall contact while the actor position remains stationary.
+	# Do not start the displacement window when merely approaching the wall.
+	# Wait until the solver reports actual contact, then keep the same movement
+	# intent active and verify the actor cannot continue through the obstacle.
 	var wall_contact_position_x := actor.global_position.x
-	var wall_contact := actor.is_on_wall()
 	for _step in range(12):
 		await physics_frame
-		wall_contact = wall_contact or actor.is_on_wall()
 	var wall_horizontal_displacement := absf(actor.global_position.x - wall_contact_position_x)
-	_check(wall_contact, "production CharacterBody3D reports contact with the vertical wall")
 	_check(wall_horizontal_displacement < 0.03, "wall collision prevents continued horizontal displacement")
 
 	movement.set_move_intent(Vector2.ZERO)
