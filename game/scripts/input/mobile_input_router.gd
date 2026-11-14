@@ -75,7 +75,9 @@ func is_action_supported(action: int) -> bool:
 			var ability_id := definition.get_ability_id_for_slot(action)
 			return _combat != null and ability_id != &"" and definition.owns_ability(ability_id)
 		MobileInputAction.Action.PAUSE:
-			return not get_signal_connection_list("pause_requested").is_empty()
+			# PAUSE is a notification event, not a capability lookup. Emitting
+			# an unhandled signal is safe when no game-state owner is connected.
+			return true
 		MobileInputAction.Action.INTERACT:
 			return not get_signal_connection_list("interaction_requested").is_empty()
 		MobileInputAction.Action.CANCEL:

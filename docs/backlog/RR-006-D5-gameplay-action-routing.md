@@ -9,10 +9,11 @@ Route validated semantic input commands into existing gameplay authorities and v
 - It dispatches through public APIs only:
   - MOVE / JUMP / LANE_LEFT / LANE_RIGHT → `CharacterMovementController`.
   - BASIC_ATTACK / ABILITY_PRIMARY / ABILITY_SECONDARY → `HeroCombatController`.
-  - PAUSE / INTERACT → integration signals consumed by game-state or interaction owners.
+  - PAUSE → emits a game-state notification signal; routing remains valid even if no pause owner is currently connected.
+  - INTERACT → emits only when an interaction owner is connected; otherwise it is rejected.
   - CANCEL → clears movement owned by the originating source and emits a cancellation signal.
 - Hero `CharacterDefinition` now declares explicit primary and secondary ability slots. Slot IDs must refer to abilities owned by that hero; duplicate slot assignments are invalid.
-- Unsupported actions (currently DODGE and unbound INTERACT/PAUSE) return an explicit error. They never silently succeed.
+- Unsupported actions (currently DODGE and unbound INTERACT) return an explicit error. PAUSE is a notification event and can be emitted safely with zero listeners.
 - No movement physics, combat timing, ability effects, network calls or AI inference are implemented in the router.
 
 ## Movement-source boundary
@@ -27,7 +28,8 @@ D5 supports one active MOVE source at a time. A different source receives `ERR_B
 - [ ] Basic attacks delegate to HeroCombatController.
 - [ ] Ability slots are explicit in each hero resource and validated against owned abilities.
 - [ ] Ability commands cannot invoke another hero's ability or bypass cooldown checks.
-- [ ] PAUSE/INTERACT require a connected owner signal; unsupported actions return an explicit error.
+- [ ] PAUSE emits its notification signal when routed, whether or not a game-state owner is connected.
+- [ ] INTERACT requires a connected interaction owner; unsupported actions return an explicit error.
 - [ ] Dead/missing hero state rejects input.
 - [ ] Tests cover Vanguard, Phantom and Cipher plus stale commands, source ownership, unsupported actions and context disable.
 - [ ] CI imports project and runs D1-D5 tests with Godot 4.4.1.
