@@ -1,6 +1,8 @@
 # RR-005 D6 — Hit Reactions, Knockback, Stagger and Death Presentation
 
-**Status:** Implementation in review  
+**Status:** Implementation in review
+
+**Dependency:** RR-005 D5 branch is included in this feature branch until D5 merges to main.  
 **Branch:** `feat/rr-005-d6-hit-reactions-death`  
 **Engine:** Godot 4.4.1 · Typed GDScript
 
