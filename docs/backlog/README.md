@@ -11,7 +11,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-005 | Combat System | P0 | D1-D7 merged; device and encounter sign-off open |
 | RR-006 | Mobile Input | P0 | Not started |
 | RR-007 | Procedural World | P0 | D1-D4 merged; D5.1 runtime streaming and pooling in implementation |
-| RR-008 | Enemy AI | P0 | D1-D4 merged; D5 advanced behavior not started |
+| RR-008 | Enemy AI | P0 | D1-D4 merged; D5 squad attack coordination in implementation |
 | RR-009 | Progression and Rewards | P0 | Not started |
 | RR-010 | UI/UX and HUD | P0 | Not started |
 | RR-011 | Audio and VFX | P0 | Not started |

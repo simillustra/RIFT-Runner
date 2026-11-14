@@ -21,17 +21,19 @@ func _run() -> void:
 	root.add_child(enemy)
 	await process_frame
 	var enemy_health := enemy.get_node("HealthComponent") as HealthComponent
+	var attack_target_health := HealthComponent.new()
+	root.add_child(attack_target_health)
 	var enemy_executor := enemy.get_node("AttackExecutor") as AttackExecutor
 	var enemy_controller := enemy.get_node("EnemyCombatController") as EnemyCombatController
 	enemy_executor.set_process(false)
 	enemy_controller.attack_definition = _make_attack()
 	_check(enemy_controller.request_attack() == OK, "living enemy starts attack through D2 executor")
 	_check(enemy_executor.phase == AttackExecutor.Phase.STARTUP, "enemy attack observes D2 startup timing")
-	_check(enemy_executor.try_hit(enemy_health) == 0.0, "enemy cannot damage during startup")
+	_check(enemy_executor.try_hit(attack_target_health) == 0.0, "enemy cannot damage during startup")
 	enemy_executor.update_timers(0.1)
 	_check(enemy_executor.is_active(), "enemy attack enters D2 active window")
-	_check(enemy_executor.try_hit(enemy_health) == 20.0, "D2 executor remains the only enemy damage execution path")
-	enemy_executor.update_timers(0.2)
+	_check(enemy_executor.try_hit(attack_target_health) == 20.0, "D2 executor remains the only enemy damage execution path")
+	enemy_executor.update_timers(0.21)
 	_check(enemy_executor.phase == AttackExecutor.Phase.RECOVERY, "enemy attack closes into D2 recovery")
 	enemy_health.apply_damage(1000.0)
 	_check(enemy_controller.request_attack() == ERR_UNCONFIGURED, "dead enemy cannot request another attack")
@@ -58,6 +60,7 @@ func _run() -> void:
 
 	enemy.queue_free()
 	boss.queue_free()
+	attack_target_health.queue_free()
 	await process_frame
 	_finish()
 
