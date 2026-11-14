@@ -36,6 +36,7 @@ func _run() -> void:
 	_check(flanker_chase.update_steering(0.1).length() > 0.0, "assigned flanker receives a distinct tactical approach")
 	ai.retreat_health_ratio = 0.5
 	ai.retreat_distance = 6.0
+	assault.position = Vector3(0.0, 0.0, -7.0)
 	ai.set_target(target)
 	(assault.get_node("HealthComponent") as HealthComponent).apply_damage(60.0)
 	ai.update_decision(0.016)
