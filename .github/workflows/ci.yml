@@ -46,6 +46,8 @@ jobs:
         run: godot --headless --path . --script res://tests/tap_press_gesture_recognizer_test.gd
       - name: Run RR-006 gameplay action router test suite
         run: godot --headless --path . --script res://tests/mobile_input_router_test.gd
+      - name: Run RR-006 mode, context and accessibility test suite
+        run: godot --headless --path . --script res://tests/mobile_input_context_controller_test.gd
       - name: Run RR-005 health component test suite
         run: godot --headless --path . --script res://tests/health_component_test.gd
       - name: Run RR-005 attack executor test suite
