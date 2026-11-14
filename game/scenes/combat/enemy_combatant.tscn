@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/combat/health_component.gd" id="1_health"]
 [ext_resource type="Script" path="res://game/scripts/combat/attack_executor.gd" id="2_executor"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://game/scripts/combat/combat_hitbox.gd" id="4_hitbox"]
 [ext_resource type="Script" path="res://game/scripts/combat/combat_hurtbox.gd" id="5_hurtbox"]
 [ext_resource type="Script" path="res://game/scripts/combat/combat_reaction_controller.gd" id="6_reactions"]
+[ext_resource type="Script" path="res://game/scripts/ai/enemy_ai_controller.gd" id="7_ai"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
 radius = 0.45
@@ -30,6 +31,9 @@ script = ExtResource("2_executor")
 
 [node name="EnemyCombatController" type="Node" parent="."]
 script = ExtResource("3_enemy")
+
+[node name="EnemyAIController" type="Node" parent="."]
+script = ExtResource("7_ai")
 
 [node name="CombatReactionController" type="Node" parent="."]
 script = ExtResource("6_reactions")

@@ -2,7 +2,7 @@ name: Godot CI
 
 on:
   push:
-    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "docs/**"]
+    branches: ["main", "rr-001/**", "rr-003/**", "rr-004/**", "feat/rr-004/**", "feat/rr-005/**", "feat/rr-007/**", "feat/rr-008/**", "feat/rr-007-008*", "docs/**"]
   pull_request:
     branches: ["main"]
   workflow_dispatch:
@@ -50,3 +50,7 @@ jobs:
         run: godot --headless --path . --script res://tests/combat_reaction_test.gd
       - name: Run RR-005 deterministic encounter validation suite
         run: godot --headless --path . --script res://tests/combat_encounter_validation_test.gd
+      - name: Run RR-007 procedural world generator test suite
+        run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
+      - name: Run RR-008 enemy AI controller test suite
+        run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
