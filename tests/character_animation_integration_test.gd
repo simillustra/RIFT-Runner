@@ -29,8 +29,6 @@ func _run() -> void:
 
 	var animated_actor := actor_scene.instantiate() as CharacterActor
 	var movement := animated_actor.get_node("MovementController") as CharacterMovementController
-	movement.set_physics_process(false)
-	movement.is_grounded = true
 	var player := AnimationPlayer.new()
 	player.name = "AnimationPlayer"
 	var library := AnimationLibrary.new()
@@ -43,6 +41,13 @@ func _run() -> void:
 	tree.anim_player = NodePath("../AnimationPlayer")
 	animated_actor.add_child(tree)
 	root.add_child(animated_actor)
+
+	# Disable movement physics after the actor enters the tree. The movement
+	# controller's physics step samples CharacterBody3D.is_on_floor() and would
+	# otherwise overwrite this deterministic grounded test fixture.
+	movement.set_physics_process(false)
+	movement.is_grounded = true
+	animated_actor.velocity = Vector3.ZERO
 	await process_frame
 	await process_frame
 
@@ -52,11 +57,15 @@ func _run() -> void:
 	_check(controller != null and controller._initialized, "integration creates an initialized D4 controller")
 	_check(tree.active, "integrated AnimationTree is activated")
 	if controller != null:
+		var snapshot_before := movement.get_animation_state()
+		_check(snapshot_before.is_grounded, "fixture establishes grounded movement snapshot before animation sampling")
+		_check(snapshot_before.planar_velocity.is_zero_approx(), "fixture establishes stationary movement snapshot before animation sampling")
 		var velocity_before := animated_actor.velocity
+		var grounded_before := movement.is_grounded
 		controller.update_animation(0.016)
-		_check(controller.get_current_state() == CharacterAnimationGraph.STATE_IDLE, "integrated controller samples the movement snapshot")
+		_check(controller.get_current_state() == CharacterAnimationGraph.STATE_IDLE, "integrated controller samples the stationary grounded movement snapshot")
 		_check(animated_actor.velocity == velocity_before, "animation integration never mutates actor velocity")
-	_check(movement.is_grounded, "animation integration never mutates grounded state")
+		_check(movement.is_grounded == grounded_before, "animation integration never mutates grounded state")
 	animated_actor.queue_free()
 	await process_frame
 
