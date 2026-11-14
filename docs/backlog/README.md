@@ -1,6 +1,6 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance evidence is tracked separately. RR-004 D1-D6 and the D7 automated asset-contract validation baseline are merged; production rig, visual and device evidence remains outstanding. RR-005 D1 is merged with CI passed; D2 attack execution is in implementation review.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance evidence is tracked separately. RR-004 D1-D6 and the D7 automated asset-contract validation baseline are merged; production rig, visual and device evidence remains outstanding. RR-005 D1 and D2 are merged with CI passed; D3 collision hit detection is in implementation review.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
@@ -8,7 +8,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-002 | Character Framework | P0 | Accepted / merged |
 | RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
 | RR-004 | Animation Framework | P0 | D1-D6 and D7 automated baseline merged; visual/device sign-off open |
-| RR-005 | Combat System | P0 | D1 merged; D2 in review |
+| RR-005 | Combat System | P0 | D1-D2 merged; D3 in review |
 | RR-006 | Mobile Input | P0 | Not started |
 | RR-007 | Procedural World | P0 | Not started |
 | RR-008 | Enemy AI | P0 | Not started |
