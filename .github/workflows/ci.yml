@@ -28,3 +28,5 @@ jobs:
         run: godot --headless --path . --script res://tests/animation_profile_test.gd
       - name: Run animation tree graph test suite
         run: godot --headless --path . --script res://tests/animation_tree_graph_test.gd
+      - name: Run character animation controller test suite
+        run: godot --headless --path . --script res://tests/character_animation_controller_test.gd
