@@ -80,6 +80,8 @@ func begin_pointer(pointer_id: int, local_position: Vector2, pressure: float = 0
 		return false
 	if pointer_id == NO_POINTER or not Rect2(Vector2.ZERO, size).has_point(local_position):
 		return false
+	if _pending_tap_count > 0 and _multi_tap_remaining <= 0.0:
+		_flush_pending_taps()
 	_active_pointer = pointer_id
 	_press_origin = local_position
 	_press_elapsed = 0.0
@@ -135,8 +137,9 @@ func advance_time(delta: float) -> void:
 		_press_elapsed += delta
 		if _press_elapsed >= gesture_profile.long_press_seconds:
 			_long_press_fired = true
+			_flush_pending_taps()
 			_emit_action(&"long_press", gesture_profile.long_press_action)
-	if _pending_tap_count > 0:
+	if _pending_tap_count > 0 and _active_pointer == NO_POINTER:
 		_multi_tap_remaining = maxf(_multi_tap_remaining - delta, 0.0)
 		if _multi_tap_remaining <= 0.0:
 			_flush_pending_taps()
@@ -159,6 +162,7 @@ func _evaluate_hard_press() -> void:
 		return
 	if _press_pressure >= gesture_profile.hard_press_pressure_threshold:
 		_hard_press_fired = true
+		_flush_pending_taps()
 		_emit_action(&"hard_press", gesture_profile.hard_press_action)
 
 
