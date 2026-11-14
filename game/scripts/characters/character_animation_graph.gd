@@ -99,5 +99,4 @@ static func _animation_node(clip_name: StringName) -> AnimationNodeAnimation:
 static func _add_transition(machine: AnimationNodeStateMachine, from_state: StringName, to_state: StringName) -> void:
 	var transition := AnimationNodeStateMachineTransition.new()
 	transition.xfade_time = 0.12
-	transition.switch_mode = AnimationNodeStateMachineTransition.SWITCH_MODE_CROSS
 	machine.add_transition(from_state, to_state, transition)
