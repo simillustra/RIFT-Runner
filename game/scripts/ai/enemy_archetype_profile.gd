@@ -2,6 +2,7 @@ extends Resource
 class_name EnemyArchetypeProfile
 ## Data-only tuning and engagement policy for a local enemy archetype.
 enum EngagementPolicy { PURSUER, SKIRMISHER, RANGED }
+enum SquadRole { ASSAULT, FLANKER, SUPPORT }
 @export var archetype_id: StringName = &"infected_grunt"
 @export_range(0.5, 100.0, 0.1) var detection_range: float = 12.0
 @export_range(0.5, 100.0, 0.1) var attack_range: float = 2.0
@@ -11,6 +12,9 @@ enum EngagementPolicy { PURSUER, SKIRMISHER, RANGED }
 @export_range(0.1, 20.0, 0.1) var acceleration: float = 12.0
 @export_range(0.1, 30.0, 0.1) var turn_speed: float = 10.0
 @export var engagement_policy: EngagementPolicy = EngagementPolicy.PURSUER
+@export var squad_role: SquadRole = SquadRole.ASSAULT
+@export_range(0.0, 0.9, 0.05) var retreat_health_ratio: float = 0.0
+@export_range(1.0, 30.0, 0.5) var retreat_distance: float = 8.0
 
 func validate() -> PackedStringArray:
 	var errors := PackedStringArray()
@@ -18,4 +22,6 @@ func validate() -> PackedStringArray:
 	if attack_range > detection_range: errors.append("attack_range must not exceed detection_range.")
 	if lose_target_range < detection_range: errors.append("lose_target_range must be at least detection_range.")
 	if preferred_attack_distance <= 0.0: errors.append("preferred_attack_distance must be positive.")
+	if retreat_health_ratio < 0.0 or retreat_health_ratio >= 1.0: errors.append("retreat_health_ratio must be in [0, 1).")
+	if retreat_distance <= preferred_attack_distance: errors.append("retreat_distance must exceed preferred_attack_distance.")
 	return errors

@@ -28,10 +28,21 @@ func _physics_process(delta: float) -> void:
 
 func update_steering(delta: float) -> Vector3:
 	if delta <= 0.0 or _actor == null or _ai == null: return Vector3.ZERO
-	if _ai.current_state != EnemyAIController.State.CHASE or not is_instance_valid(_ai.target):
+	if not is_instance_valid(_ai.target) or _ai.current_state == EnemyAIController.State.DEAD or _ai.current_state == EnemyAIController.State.STAGGERED:
 		_brake(delta)
 		return Vector3.ZERO
 	var target_position := _ai.target.global_position
+	if _ai.current_state == EnemyAIController.State.RETREAT:
+		var away := _actor.global_position - target_position
+		away.y = 0.0
+		away = away.normalized() if away.length_squared() > 0.0001 else -_actor.global_transform.basis.z
+		_face_direction(away, delta)
+		var retreat_velocity := away * move_speed
+		_apply_horizontal_velocity(retreat_velocity, delta)
+		return retreat_velocity
+	if _ai.current_state != EnemyAIController.State.CHASE:
+		_brake(delta)
+		return Vector3.ZERO
 	var offset := target_position - _actor.global_position
 	offset.y = 0.0
 	var distance := offset.length()
