@@ -75,7 +75,17 @@ func _run() -> void:
 	_check(highest_y > initial_y + 0.25, "production actor climbs the collision-backed slope")
 	_check(actor.global_position.x < WALL_CENTER_X - 0.25, "production capsule is blocked by the arena wall")
 	_check(actor.is_on_floor() and movement.is_grounded, "production actor retains grounded contact on the slope")
-	_check(actor.velocity.x < 0.5, "wall collision prevents continued horizontal movement through the obstacle")
+	# Velocity records the requested movement for the physics step and is not a
+	# reliable collision assertion on its own. Keep intent active and verify the
+	# solver reports wall contact while the actor position remains stationary.
+	var wall_contact_position := actor.global_position
+	var wall_contact := actor.is_on_wall()
+	for _step in range(12):
+		await physics_frame
+		wall_contact = wall_contact or actor.is_on_wall()
+	var wall_displacement := actor.global_position.distance_to(wall_contact_position)
+	_check(wall_contact, "production CharacterBody3D reports contact with the vertical wall")
+	_check(wall_displacement < 0.03, "wall collision prevents continued horizontal displacement")
 
 	movement.set_move_intent(Vector2.ZERO)
 	actor.queue_free()
