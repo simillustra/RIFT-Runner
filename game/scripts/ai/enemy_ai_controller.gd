@@ -234,8 +234,6 @@ func _on_attack_finished(_definition: AttackDefinition) -> void:
 	_release_attack_slot()
 
 func _release_attack_slot() -> void:
-	if not _attack_slot_reserved:
-		return
 	if is_instance_valid(_squad_coordinator):
 		_squad_coordinator.release_attack_slot(get_parent() as Node3D)
 	_attack_slot_reserved = false
