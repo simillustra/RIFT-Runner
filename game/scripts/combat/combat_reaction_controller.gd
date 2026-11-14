@@ -128,6 +128,10 @@ func _disable_combat_collision() -> void:
 			hurtbox.set_hurtbox_enabled(false)
 
 
+func reset_for_spawn() -> void:
+	_dead = false
+	_fallback_stagger_remaining = 0.0
+
 func is_dead() -> bool:
 	return _dead
 

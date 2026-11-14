@@ -8,7 +8,7 @@ signal encounter_released(segment: Node3D, pooled_enemy_count: int)
 @export var spawn_director: EncounterSpawnDirector
 @export var spawn_definitions: Array[EnemySpawnDefinition] = []
 @export_range(0, 64, 1) var max_pooled_enemies: int = 16
-@export_range(0, 16, 1) var squad_attack_cap: int = 2
+@export_range(1, 16, 1) var squad_attack_cap: int = 2
 @export_range(0, 20, 1) var difficulty_level: int = 0
 
 var _generator: ProceduralWorldGenerator
@@ -177,6 +177,7 @@ func _acquire_enemy(definition: EnemySpawnDefinition) -> Node3D:
 		_pooled_enemy_count -= 1
 		_pool_root.remove_child(pooled)
 		_restore_enemy(pooled)
+		_reset_enemy_for_spawn(pooled)
 		return pooled
 	var instance := definition.enemy_scene.instantiate()
 	var enemy := instance as Node3D
@@ -184,7 +185,22 @@ func _acquire_enemy(definition: EnemySpawnDefinition) -> Node3D:
 		instance.free()
 		push_warning("Enemy scene '%s' does not have a Node3D root." % String(definition.definition_id))
 		return null
+	_reset_enemy_for_spawn(enemy)
 	return enemy
+
+func _reset_enemy_for_spawn(enemy: Node3D) -> void:
+	var health := enemy.get_node_or_null("HealthComponent") as HealthComponent
+	if health != null:
+		health.reset_health()
+	var reactions := enemy.get_node_or_null("CombatReactionController") as CombatReactionController
+	if reactions != null:
+		reactions.reset_for_spawn()
+	var ai := enemy.get_node_or_null("EnemyAIController") as EnemyAIController
+	if ai != null:
+		ai.reset_for_spawn()
+	var body := enemy as CharacterBody3D
+	if body != null:
+		body.velocity = Vector3.ZERO
 
 func _pool_enemy(enemy: Node3D) -> void:
 	if enemy == null or not is_instance_valid(enemy):
