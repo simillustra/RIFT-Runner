@@ -16,12 +16,17 @@ var _active_encounters: Dictionary = {}
 var _pool_by_definition: Dictionary = {}
 var _pooled_enemy_count: int = 0
 var _pool_root: Node3D
+var _configuration_valid: bool = false
 
 func _ready() -> void:
 	_generator = get_parent() as ProceduralWorldGenerator
 	if _generator == null:
 		push_error("EncounterRuntimeSpawner must be a child of ProceduralWorldGenerator.")
 		return
+	var configuration_errors := validate_configuration()
+	_configuration_valid = configuration_errors.is_empty()
+	if not _configuration_valid:
+		push_error("EncounterRuntimeSpawner configuration is invalid: %s" % "; ".join(configuration_errors))
 	_ensure_pool_root()
 	_generator.segment_spawned.connect(_on_segment_spawned)
 	_generator.segment_recycled.connect(_on_segment_recycled)
@@ -87,11 +92,7 @@ func release_segment(segment: Node3D) -> void:
 	encounter_released.emit(segment, released_count)
 
 func _on_segment_spawned(segment: Node3D, _definition: WorldSegmentDefinition) -> void:
-	if segment == null or not is_instance_valid(segment) or spawn_director == null:
-		return
-	var errors := validate_configuration()
-	if not errors.is_empty():
-		push_warning("EncounterRuntimeSpawner configuration is invalid: %s" % "; ".join(errors))
+	if segment == null or not is_instance_valid(segment) or not _configuration_valid:
 		return
 	var segment_instance_id: int = segment.get_instance_id()
 	if _active_encounters.has(segment_instance_id):

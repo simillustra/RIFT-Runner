@@ -64,26 +64,45 @@ func _run() -> void:
 	_check(spawner.get_active_enemy_count(segment) == 2, "spawn plan instantiates enemies within budget and concurrency cap")
 	var encounter := spawner.get_encounter_root(segment)
 	_check(encounter != null, "spawned enemies belong to a segment-scoped encounter")
-	var coordinator := encounter.get_node_or_null("EnemySquadCoordinator") as EnemySquadCoordinator
-	_check(coordinator != null, "encounter creates one shared squad coordinator")
+	var coordinator: EnemySquadCoordinator
 	var first_enemy: Node3D = null
-	for child: Node in encounter.get_children():
-		if child is CharacterBody3D:
-			first_enemy = child as Node3D
-			break
+	if encounter != null:
+		coordinator = encounter.get_node_or_null("EnemySquadCoordinator") as EnemySquadCoordinator
+		for child: Node in encounter.get_children():
+			if child is CharacterBody3D:
+				first_enemy = child as Node3D
+				break
+	_check(coordinator != null, "encounter creates one shared squad coordinator")
 	_check(first_enemy != null, "runtime enemy scene is instantiated")
 	if first_enemy != null:
 		var ai := first_enemy.get_node_or_null("EnemyAIController") as EnemyAIController
 		var applied := first_enemy.get_node_or_null("EnemyArchetypeController") as EnemyArchetypeController
 		_check(ai != null and ai.has_squad_coordinator(), "spawned AI receives encounter squad coordinator")
 		_check(applied != null and applied.profile == archetype, "spawned enemy receives authored archetype profile")
+		var health := first_enemy.get_node_or_null("HealthComponent") as HealthComponent
+		_check(health != null and health.apply_damage(1000.0) > 0.0, "spawned enemy can enter the death state")
 
 	spawner.release_segment(segment)
+	await process_frame
 	_check(spawner.get_active_enemy_count() == 0, "recycling segment releases active encounter")
 	_check(spawner.get_pooled_enemy_count() == 2, "recycled enemies enter bounded pool")
 	generator.segment_spawned.emit(segment, segment_definition)
 	_check(spawner.get_active_enemy_count(segment) == 2, "subsequent encounter reuses pooled enemy instances")
 	_check(spawner.get_pooled_enemy_count() == 0, "reused enemies leave the pool")
+	var reused_encounter := spawner.get_encounter_root(segment)
+	var reused_enemy: Node3D
+	if reused_encounter != null:
+		for child: Node in reused_encounter.get_children():
+			if child is CharacterBody3D:
+				reused_enemy = child as Node3D
+				break
+	if reused_enemy != null:
+		var reused_health := reused_enemy.get_node_or_null("HealthComponent") as HealthComponent
+		var reused_ai := reused_enemy.get_node_or_null("EnemyAIController") as EnemyAIController
+		var reused_reactions := reused_enemy.get_node_or_null("CombatReactionController") as CombatReactionController
+		_check(reused_health != null and not reused_health.is_dead and is_equal_approx(reused_health.current_health, reused_health.max_health), "pooled enemy health resets before reuse")
+		_check(reused_ai != null and reused_ai.current_state == EnemyAIController.State.IDLE, "pooled enemy AI resets before reuse")
+		_check(reused_reactions != null and not reused_reactions.is_dead(), "pooled enemy death presentation resets before reuse")
 	generator.clear_generated_segments()
 	await process_frame
 	_check(spawner.get_pooled_enemy_count() == 0, "generation reset disposes pooled enemies")
