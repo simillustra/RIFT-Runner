@@ -22,7 +22,7 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 
 ### A. Physics behavior
 
-- [ ] Add deterministic physics-fixture tests using a real `CharacterBody3D` and a known floor/collision setup.
+- [x] Add deterministic physics-fixture tests using a real `CharacterBody3D` and a known floor/collision setup (D1 covers floor contact, grounded transitions, grounded downward-velocity resolution and airborne gravity).
 - [ ] Verify gravity increases downward velocity while airborne and does not accumulate downward velocity while grounded.
 - [ ] Verify a jump request while grounded produces the configured upward launch velocity within the documented test tolerance.
 - [ ] Verify a jump request while airborne is ignored and cannot trigger a second jump.
@@ -52,7 +52,7 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Godot 4.4.1 editor import/class registration succeeds in CI.
 - [x] Headless foundation smoke test succeeds in CI run #15.
 - [x] Headless movement test script succeeds in CI run #15.
-- [ ] Add and pass the deterministic physics tests listed above in CI.
+- [ ] Pass the RR-003 D1 deterministic physics-fixture test in CI; broader jump, lane and free-movement physics assertions remain for subsequent acceptance steps.
 - [ ] Run the full CI suite on the final acceptance commit.
 
 ## 3. Acceptance decision
