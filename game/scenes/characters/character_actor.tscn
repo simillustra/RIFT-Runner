@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://game/scripts/characters/character_actor.gd" id="1_actor"]
 [ext_resource type="Script" path="res://game/scripts/characters/character_movement_controller.gd" id="2_movement"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://game/scripts/combat/attack_executor.gd" id="6_attack_executor"]
 [ext_resource type="Script" path="res://game/scripts/combat/hero_combat_controller.gd" id="7_hero_combat"]
 [ext_resource type="Script" path="res://game/scripts/combat/combat_reaction_controller.gd" id="8_reactions"]
+[ext_resource type="Script" path="res://game/scripts/input/mobile_input_router.gd" id="9_input_router"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_actor"]
 radius = 0.42
@@ -39,3 +40,6 @@ script = ExtResource("7_hero_combat")
 
 [node name="CombatReactionController" type="Node" parent="."]
 script = ExtResource("8_reactions")
+
+[node name="MobileInputRouter" type="Node" parent="."]
+script = ExtResource("9_input_router")

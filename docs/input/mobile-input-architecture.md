@@ -1,62 +1,52 @@
 # Mobile Input Architecture
 
-**Status:** RR-006 D1-D4 implementation baseline. Guided joystick, free-hand swipe/drag and tap/press recognizers emit semantic commands; gameplay routing remains deferred.
+**Status:** RR-006 D1-D5 implementation baseline. Guided joystick, free-hand swipe/drag, tap/press and deterministic gameplay action routing are implemented. Context/mode management and multi-source arbitration remain future milestones.
 
 ## Goals
-- Support Guided (virtual joystick and explicit action controls) and Free-hand (gesture-driven) control modes.
-- Translate device events into a stable, device-neutral semantic action vocabulary.
+- Support Guided and Free-hand controls through a device-neutral semantic action vocabulary.
 - Keep movement, combat, abilities, game state and health authoritative in existing gameplay systems.
-- Keep gesture grammar configurable and testable; do not freeze unvalidated meanings.
-- Keep input processing local and deterministic. No remote AI, network dependency or asynchronous service in the input-to-gameplay path.
+- Keep gesture grammar configurable and deterministic.
+- Keep input processing local. No remote AI, network dependency or asynchronous service in the input-to-gameplay path.
 
 ## Layers and ownership
-1. Device recognizers (D2-D4) own pointer tracking, thresholds, gesture classification and cancellation.
-2. MobileInputCommand (D1) carries action, phase, mode, normalized movement vector, strength, optional ability ID, source ID and monotonic sequence ID. It contains intent only.
-3. The later input router validates commands, applies context/priority policy and dispatches to gameplay interfaces.
-4. CharacterMovementController owns movement requests; HeroCombatController owns attack and ability acceptance/cooldowns; game-state systems own pause/menu state.
+1. Device recognizers (D2-D4) own pointer tracking and gesture classification.
+2. `MobileInputCommand` (D1) carries action, phase, mode, vector, strength, optional ability ID, source ID and monotonic sequence ID.
+3. `MobileInputRouter` (D5) validates commands, applies the currently enabled gameplay-input gate, checks hero capability and dispatches to public gameplay APIs.
+4. `CharacterMovementController` owns movement requests; `HeroCombatController` owns attack and ability acceptance/cooldowns; game-state and interaction systems own pause and interaction behavior.
 5. HUD, animation and VFX observe gameplay state; they do not reinterpret raw touch input.
 
-## Command contract
-- Actions, phases and modes use MobileInputAction enums.
-- MOVE vectors are finite and length <= 1.0; strength is finite and in [0, 1].
-- Ability actions require a non-empty ability_id.
-- source_id identifies a recognizer/control; sequence_id is non-negative and monotonically increasing per source.
-- Non-MOVE actions carry a zero vector. Validate before dispatch.
-- A canceled MOVE neutralizes only its source contribution; future router arbitration must prevent one source from canceling another.
+## Action routing
+| Semantic action | D5 destination | Capability rule |
+|---|---|---|
+| MOVE | `CharacterMovementController.set_move_intent` | Free movement mode only |
+| JUMP | `CharacterMovementController.request_jump` | Movement controller must exist |
+| LANE_LEFT / LANE_RIGHT | `request_lane_change(-1/+1)` | Lane movement mode only |
+| BASIC_ATTACK | `HeroCombatController.execute_basic_attack` | Hero must define a valid basic attack |
+| ABILITY_PRIMARY / SECONDARY | `HeroCombatController.activate_ability` | Explicit slot ID must match an ability owned by active hero |
+| PAUSE | `pause_requested` signal | Game-state owner must be connected |
+| INTERACT | `interaction_requested` signal | Interaction owner must be connected |
+| CANCEL | `cancel_requested` signal | Clears this source's active movement contribution |
+| DODGE | Not implemented | Returns `ERR_UNAVAILABLE`; never silently succeeds |
 
-## Guided virtual joystick (D2)
-- VirtualJoystick is a reusable Control with single-pointer ownership, radial deadzone and clamped normalized MOVE output.
-- Screen-right maps to +X and screen-up maps to +Y.
-- It emits intent only and never calls movement or changes physics.
+## Validation and lifecycle
+- Validate command enum values, finite payloads, vector bounds, ability IDs and source IDs before dispatch.
+- Enforce strictly increasing sequence IDs per source to reject stale/replayed commands.
+- Require a valid active CharacterDefinition and living HealthComponent.
+- Disabling gameplay input rejects new commands and neutralizes active movement.
+- D5 permits one MOVE source at a time. A competing source receives `ERR_BUSY`; the owner must cancel before another source can claim movement. This is a safe interim policy, not the final multi-source design.
+- Unsupported action or missing integration owner returns an explicit error.
+- The router invokes only public request methods. It contains no movement physics, attack timing, ability effects or remote calls.
 
-## Free-hand swipe and drag recognizer (D3)
-- FreeHandGestureRecognizer is a reusable Control with one active pointer. The first pointer beginning inside its rectangle owns the gesture until release/cancel.
-- FreeHandGestureProfile selects exactly one recognition mode per instance: cardinal swipe or continuous drag.
-- Directional swipe mode compares displacement with a configurable threshold and resolves diagonals by dominant axis (horizontal on ties). Direction-to-action bindings live in the profile.
-- Continuous-drag mode activates after its threshold, applies a pixel deadzone, converts screen coordinates to normalized MOVE and emits neutral CANCELED on release or interruption.
-- Default bindings (left/right lane change, up jump, down dodge) are provisional and must be validated in playtests.
+## Hero capability slots
+Each hero resource declares `primary_ability_id` and optional `secondary_ability_id`. The IDs must reference distinct entries in that hero's `abilities` array. The router rejects an ability command unless its ID exactly matches the requested slot and is owned by the active hero.
 
-## Tap and press recognition (D4)
-- TapPressGestureRecognizer supports tap, double-tap, triple-tap, long-press and optional pressure-aware hard-press.
-- Tap classification is delayed by the configurable multi-tap window. A third tap resolves the sequence as triple-tap rather than emitting a double-tap first.
-- Long press fires once at its duration threshold. Movement beyond the tap tolerance cancels the gesture.
-- Hard press is disabled by default; pressure support varies by device and must be validated before enabling.
-- Gesture-to-action bindings are profile data and provisional. Discrete actions emit FREE_HAND STARTED/PERFORMED pairs.
-- Focus loss, tree exit and explicit cancellation clear active and pending gesture state.
-- The recognizer emits commands only; it never invokes gameplay controllers or mutates physics.
+## Recognizer contracts
+- D2 virtual joystick emits normalized MOVE commands with source and sequence metadata.
+- D3 swipe/drag recognizer emits configured semantic commands or normalized MOVE.
+- D4 tap/press recognizer delays multi-tap classification to resolve tap conflicts and emits discrete semantic commands.
+- Recognizers emit intent only; they do not call gameplay controllers or mutate physics.
 
-## Context and lifecycle
-- Pause, menus, dialogs, loading, death and transitions must suppress gameplay commands; router/context work owns this policy.
-- UI-consumed touches must not leak into gameplay recognizers.
-- Recognizers track pointer IDs. On focus loss, app suspension, scene/mode change or control destruction, cancel active recognizers.
-- Commands run on the main gameplay thread. No remote calls, awaits, network responses or AI inference in the input-to-gameplay path.
-
-## Planned sequence
-- D1: semantic command contract and CI tests.
-- D2: guided virtual joystick.
-- D3: free-hand directional swipe/drag recognizer.
-- D4: tap/press recognition.
-- D5: gameplay action routing and hero capability validation.
-- D6: mode switching, context suppression, settings and accessibility.
-- D7: multi-source arbitration, buffering and lifecycle hardening.
-- D8: integration tests, device validation and performance baseline.
+## Deferred
+- D6: atomic mode switching, full gameplay context ownership, settings and accessibility.
+- D7: multi-source movement arbitration, deterministic priorities, input buffering and lifecycle hardening.
+- D8: integrated automated validation, Android/iOS device acceptance and performance baseline.

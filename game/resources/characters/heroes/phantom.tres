@@ -22,3 +22,4 @@ description = "A fast, evasive hero built around repositioning and precision."
 stats = SubResource("CharacterStats_phantom")
 basic_attack = ExtResource("4_basic_attack")
 abilities = Array[ExtResource("2_ability_script")]([ExtResource("3_ability")])
+primary_ability_id = &"phase_shift"
