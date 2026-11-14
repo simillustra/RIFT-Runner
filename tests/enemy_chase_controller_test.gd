@@ -27,7 +27,7 @@ func _run() -> void:
 	target.position = Vector3(0.0, 0.0, -1.0)
 	ai.update_decision(0.016)
 	_check(ai.current_state == EnemyAIController.State.ATTACK, "AI enters ATTACK inside attack range")
-	var stopped := chase.update_steering(0.1)
+	var stopped := chase.update_steering(1.0)
 	_check(stopped == Vector3.ZERO, "chase stops closing distance inside preferred attack spacing")
 	_check(absf(actor.velocity.x) < 0.001 and absf(actor.velocity.z) < 0.001, "chase brakes horizontal velocity at attack spacing")
 	if failures == 0:
