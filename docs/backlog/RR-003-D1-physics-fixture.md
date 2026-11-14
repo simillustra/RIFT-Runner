@@ -1,6 +1,6 @@
 # RR-003 D1 — Deterministic Physics Fixture
 
-**Status:** Implemented; CI verification pending  
+**Status:** CI verified in [run #43649232438](https://github.com/simillustra/RIFT-Runner/actions/runs/43649232438)  
 **Scope:** Establish a repeatable fixture using Godot's real `CharacterBody3D` collision solver.
 
 ## Fixture
