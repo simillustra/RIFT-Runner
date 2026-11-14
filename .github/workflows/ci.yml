@@ -58,6 +58,10 @@ jobs:
         run: godot --headless --path . --script res://tests/world_streaming_pool_test.gd
       - name: Run RR-007 runtime encounter spawner test suite
         run: godot --headless --path . --script res://tests/encounter_runtime_spawner_test.gd
+      - name: Run RR-007/008 D5.4 end-to-end integration suite
+        run: godot --headless --path . --script res://tests/world_encounter_integration_test.gd
+      - name: Run RR-007 D5.4 performance smoke suite
+        run: godot --headless --path . --script res://tests/world_encounter_performance_test.gd
       - name: Run RR-008 enemy AI controller test suite
         run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
       - name: Run RR-008 enemy perception test suite
