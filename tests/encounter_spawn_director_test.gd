@@ -5,6 +5,15 @@ func _initialize() -> void:
 	call_deferred("_run")
 func _run() -> void:
 	var segment_root := Node3D.new()
+	var entry_socket := Marker3D.new()
+	entry_socket.name = "EntrySocket"
+	segment_root.add_child(entry_socket)
+	entry_socket.owner = segment_root
+	var exit_socket := Marker3D.new()
+	exit_socket.name = "ExitSocket"
+	exit_socket.position = Vector3(0.0, 0.0, -40.0)
+	segment_root.add_child(exit_socket)
+	exit_socket.owner = segment_root
 	var anchors := Node3D.new()
 	anchors.name = "EncounterSpawns"
 	segment_root.add_child(anchors)
