@@ -14,6 +14,7 @@ signal died(source: Node)
 var current_health: float = 100.0
 var is_dead: bool = false
 var _invulnerability_remaining: float = 0.0
+var damage_taken_multiplier: float = 1.0
 
 
 func _ready() -> void:
@@ -38,7 +39,11 @@ func configure(maximum_health: float, defense_value: float) -> Error:
 func apply_damage(raw_damage: float, source: Node = null, damage_type: StringName = &"physical") -> float:
 	if is_dead or raw_damage <= 0.0 or _invulnerability_remaining > 0.0:
 		return 0.0
-	var applied_damage := minf(maxf(raw_damage - defense, 1.0), current_health)
+	var mitigated_damage := maxf(raw_damage - defense, 1.0)
+	var scaled_damage := mitigated_damage * damage_taken_multiplier
+	if scaled_damage <= 0.0:
+		return 0.0
+	var applied_damage := minf(scaled_damage, current_health)
 	if applied_damage <= 0.0:
 		return 0.0
 	current_health = maxf(current_health - applied_damage, 0.0)
@@ -61,6 +66,14 @@ func heal(amount: float) -> float:
 	current_health += applied_healing
 	healed.emit(applied_healing, current_health)
 	return applied_healing
+
+
+## Sets a non-negative damage intake scale. Zero makes the receiver immune.
+func set_damage_taken_multiplier(multiplier: float) -> Error:
+	if multiplier < 0.0:
+		return ERR_INVALID_PARAMETER
+	damage_taken_multiplier = multiplier
+	return OK
 
 
 func reset_health() -> void:

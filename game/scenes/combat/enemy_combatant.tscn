@@ -1,0 +1,42 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://game/scripts/combat/health_component.gd" id="1_health"]
+[ext_resource type="Script" path="res://game/scripts/combat/attack_executor.gd" id="2_executor"]
+[ext_resource type="Script" path="res://game/scripts/combat/enemy_combat_controller.gd" id="3_enemy"]
+[ext_resource type="Script" path="res://game/scripts/combat/combat_hitbox.gd" id="4_hitbox"]
+[ext_resource type="Script" path="res://game/scripts/combat/combat_hurtbox.gd" id="5_hurtbox"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hitbox"]
+radius = 1.1
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hurtbox"]
+radius = 0.55
+
+[node name="EnemyCombatant" type="Node3D"]
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("1_health")
+
+[node name="AttackExecutor" type="Node" parent="."]
+script = ExtResource("2_executor")
+
+[node name="EnemyCombatController" type="Node" parent="."]
+script = ExtResource("3_enemy")
+
+[node name="Hitbox" type="Area3D" parent="."]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("4_hitbox")
+attacker_team_id = &"infected"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox"]
+shape = SubResource("SphereShape3D_hitbox")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hurtbox")
+team_id = &"infected"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+shape = SubResource("SphereShape3D_hurtbox")

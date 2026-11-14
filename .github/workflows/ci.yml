@@ -44,3 +44,5 @@ jobs:
         run: godot --headless --path . --script res://tests/combat_hit_detection_test.gd
       - name: Run RR-005 hero combat controller test suite
         run: godot --headless --path . --script res://tests/hero_combat_controller_test.gd
+      - name: Run RR-005 enemy and boss combat test suite
+        run: godot --headless --path . --script res://tests/enemy_boss_combat_test.gd
