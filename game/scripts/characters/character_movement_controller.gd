@@ -28,35 +28,57 @@ var _camera_basis: Basis = Basis.IDENTITY
 var _actor: CharacterBody3D
 var _combat_impulse: Vector3 = Vector3.ZERO
 var _stagger_remaining: float = 0.0
+var _is_operational: bool = false
+var _ownership_warning_emitted: bool = false
 
 
 func _ready() -> void:
 	_actor = get_parent() as CharacterBody3D
 	if _actor == null:
-		push_error("CharacterMovementController must be a child of CharacterBody3D.")
+		push_warning("CharacterMovementController disabled: it must be a direct child of CharacterBody3D.")
 		return
 	var errors: PackedStringArray = validate_configuration()
 	if not errors.is_empty():
-		push_error("Invalid movement configuration: %s" % "; ".join(errors))
+		push_warning("CharacterMovementController disabled by invalid configuration: %s" % "; ".join(errors))
 		return
 	lane_index = int(lane_count / 2)
+	_is_operational = true
 
 
+## Returns actionable configuration errors without mutating controller state.
 func validate_configuration() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if movement_mode != MovementMode.LANE and movement_mode != MovementMode.FREE:
+		errors.append("movement_mode must be LANE or FREE.")
 	if lane_count < 1 or lane_count % 2 == 0:
 		errors.append("lane_count must be a positive odd number.")
-	if lane_width <= 0.0:
-		errors.append("lane_width must be greater than zero.")
-	if acceleration <= 0.0 or braking <= 0.0 or lateral_speed <= 0.0:
-		errors.append("acceleration, braking and lateral_speed must be greater than zero.")
-	if jump_velocity <= 0.0 or gravity <= 0.0 or combat_impulse_decay <= 0.0:
-		errors.append("jump_velocity, gravity and combat_impulse_decay must be greater than zero.")
+	if not is_finite(lane_width) or lane_width <= 0.0:
+		errors.append("lane_width must be finite and greater than zero.")
+	if not is_finite(acceleration) or acceleration <= 0.0:
+		errors.append("acceleration must be finite and greater than zero.")
+	if not is_finite(braking) or braking <= 0.0:
+		errors.append("braking must be finite and greater than zero.")
+	if not is_finite(lateral_speed) or lateral_speed <= 0.0:
+		errors.append("lateral_speed must be finite and greater than zero.")
+	if not is_finite(jump_velocity) or jump_velocity <= 0.0:
+		errors.append("jump_velocity must be finite and greater than zero.")
+	if not is_finite(gravity) or gravity <= 0.0:
+		errors.append("gravity must be finite and greater than zero.")
+	if not is_finite(combat_impulse_decay) or combat_impulse_decay <= 0.0:
+		errors.append("combat_impulse_decay must be finite and greater than zero.")
 	return errors
 
 
+func is_operational() -> bool:
+	return _is_operational and _has_valid_actor_ownership()
+
+
+func _has_valid_actor_ownership() -> bool:
+	return is_instance_valid(_actor) and get_parent() == _actor
+
+
 func get_animation_state() -> CharacterAnimationState:
-	if _actor == null:
+	if not is_operational():
 		return CharacterAnimationState.new(Vector3.ZERO, 0.0, is_grounded, movement_mode, Basis.IDENTITY)
 	var planar_velocity := Vector3(_actor.velocity.x, 0.0, _actor.velocity.z)
 	return CharacterAnimationState.new(planar_velocity, _actor.velocity.y, is_grounded, movement_mode, _actor.global_transform.basis)
@@ -86,7 +108,7 @@ func request_lane_change(direction: int) -> void:
 
 ## Adds a world-space combat impulse and temporarily suppresses locomotion intent.
 func apply_combat_impulse(impulse: Vector3, stagger_seconds: float) -> void:
-	if is_dead or _actor == null:
+	if is_dead or not is_operational():
 		return
 	_combat_impulse += Vector3(impulse.x, 0.0, impulse.z)
 	_stagger_remaining = maxf(_stagger_remaining, maxf(stagger_seconds, 0.0))
@@ -101,7 +123,7 @@ func set_dead() -> void:
 	_combat_impulse = Vector3.ZERO
 	_move_intent = Vector2.ZERO
 	_jump_requested = false
-	if _actor != null:
+	if is_operational():
 		_actor.velocity = Vector3.ZERO
 
 
@@ -117,8 +139,15 @@ func _physics_process(delta: float) -> void:
 	physics_step(delta)
 
 
+## Invalid/non-positive time steps and invalid ownership are safe no-ops.
 func physics_step(delta: float) -> void:
-	if _actor == null or delta <= 0.0 or is_dead:
+	if not is_finite(delta) or delta <= 0.0 or is_dead or not _is_operational:
+		return
+	if not _has_valid_actor_ownership():
+		_is_operational = false
+		if not _ownership_warning_emitted:
+			push_warning("CharacterMovementController disabled: its CharacterBody3D owner is no longer its direct parent.")
+			_ownership_warning_emitted = true
 		return
 	var was_grounded := is_grounded
 	is_grounded = _actor.is_on_floor()

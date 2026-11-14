@@ -28,10 +28,22 @@ The items below are not implied by PR merge or the current CI result. Attach tes
 - [x] Verify a jump request while airborne is ignored and cannot trigger a second jump (D2).
 - [x] Verify landing restores grounded state and emits `grounded_changed` exactly on state transitions, not every physics frame (D2).
 - [x] Verify lane changes remain within bounds at both outer lanes and emit `lane_changed` only when the lane actually changes (D3 deterministic physics test).
-- [x] Verify lane movement converges on the expected lane center without overshooting (D3 checks both outer lane centers).
-- [x] Verify free movement is camera-relative, planar, normalized diagonally and reaches zero planar velocity when intent is released (D4 automated real-physics coverage; CI pending).
-- [ ] Verify zero/negative delta is safely ignored and invalid configuration is rejected with actionable diagnostics.
-- [ ] Verify missing or invalid actor ownership fails safely without runtime errors.
+- [x] Verify lane movement converges on the expected lane center without overshooting (D3 deterministic physics test).
+- [x] Verify free movement is camera-relative, planar, normalized diagonally and reaches zero planar velocity when intent is released (D4 automated real-physics coverage).
+- [x] Verify zero/negative/non-finite delta is safely ignored and invalid configuration is rejected with actionable diagnostics (D5 automated safety test).
+- [x] Verify missing or invalid actor ownership fails safely without actor mutation (D5 automated safety test).
+
+### D. CI and regression
+
+- [x] Godot 4.4.1 editor import/class registration succeeds in CI.
+- [x] Headless foundation smoke test succeeds in CI run #15.
+- [x] Headless movement test script succeeds in CI run #15.
+- [x] Pass the RR-003 D1 deterministic physics-fixture test in CI: [run #43649232438](https://github.com/simillustra/RIFT-Runner/actions/runs/43649232438).
+- [x] Pass the RR-003 D2 jump/grounded physics test in CI: [run #43649596655](https://github.com/simillustra/RIFT-Runner/actions/runs/43649596655).
+- [x] Pass the RR-003 D3 lane boundary/convergence physics test in CI: [run #43650468004](https://github.com/simillustra/RIFT-Runner/actions/runs/43650468004).
+- [ ] Pass the RR-003 D4 camera-relative free-movement physics test in CI: [run #43651408510](https://github.com/simillustra/RIFT-Runner/actions/runs/43651408510) — pending.
+- [ ] Pass the RR-003 D5 invalid delta/configuration/ownership safety test in CI.
+- [ ] Run the full CI suite on the final acceptance commit.
 
 ### B. Character and scene integration
 
