@@ -7,6 +7,7 @@ signal attack_requested
 enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, DEAD }
 @export var health_component_path: NodePath = NodePath("../HealthComponent")
 @export var enemy_combat_controller_path: NodePath = NodePath("../EnemyCombatController")
+@export var combat_reaction_controller_path: NodePath = NodePath("../CombatReactionController")
 @export_range(0.5, 100.0, 0.1) var detection_range: float = 12.0
 @export_range(0.5, 100.0, 0.1) var attack_range: float = 2.0
 @export_range(0.5, 150.0, 0.1) var lose_target_range: float = 18.0
@@ -15,11 +16,17 @@ var current_state: int = State.IDLE
 var target: Node3D
 var _health: HealthComponent
 var _combat: EnemyCombatController
+var _reactions: CombatReactionController
 var _attack_retry_remaining: float = 0.0
+var _stagger_remaining: float = 0.0
 
 func _ready() -> void:
 	_health = get_node_or_null(health_component_path) as HealthComponent
 	_combat = get_node_or_null(enemy_combat_controller_path) as EnemyCombatController
+	_reactions = get_node_or_null(combat_reaction_controller_path) as CombatReactionController
+	if _reactions != null:
+		_reactions.stagger_started.connect(_on_reaction_stagger_started)
+		_reactions.death_presented.connect(set_dead)
 	if _health == null:
 		push_warning("EnemyAIController requires a HealthComponent at '%s'." % health_component_path)
 	else:
@@ -47,12 +54,14 @@ func clear_target() -> void:
 	if current_state != State.DEAD and current_state != State.STAGGERED:
 		_transition_to(State.IDLE)
 
-func set_staggered(staggered: bool) -> void:
+func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 	if current_state == State.DEAD:
 		return
 	if staggered:
+		_stagger_remaining = maxf(duration_seconds, 0.0)
 		_transition_to(State.STAGGERED)
 	elif current_state == State.STAGGERED:
+		_stagger_remaining = 0.0
 		_transition_to(State.ALERT if is_instance_valid(target) else State.IDLE)
 
 func set_dead() -> void:
@@ -64,7 +73,13 @@ func set_dead() -> void:
 
 ## Public deterministic decision step, also called by _physics_process.
 func update_decision(delta: float) -> void:
-	if delta <= 0.0 or current_state == State.DEAD or current_state == State.STAGGERED:
+	if delta <= 0.0 or current_state == State.DEAD:
+		return
+	if current_state == State.STAGGERED:
+		if _stagger_remaining > 0.0:
+			_stagger_remaining = maxf(_stagger_remaining - delta, 0.0)
+			if _stagger_remaining <= 0.0:
+				set_staggered(false)
 		return
 	_attack_retry_remaining = maxf(_attack_retry_remaining - delta, 0.0)
 	if is_instance_valid(_health) and _health.is_dead:
@@ -116,3 +131,6 @@ func _transition_to(next_state: int) -> void:
 
 func _on_health_died(_source: Node) -> void:
 	set_dead()
+
+func _on_reaction_stagger_started(duration: float) -> void:
+	set_staggered(true, duration)
