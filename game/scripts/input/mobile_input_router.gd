@@ -207,7 +207,7 @@ func _enqueue(command: MobileInputCommand) -> Error:
 		if old.source_id == command.source_id and old.action == command.action: _buffered.remove_at(i)
 	if _buffered.size() >= max_buffered_commands: _buffered.pop_front()
 	_buffer_serial += 1
-	_buffered.append({"command": command.duplicate(true), "time": _input_clock, "serial": _buffer_serial})
+	_buffered.append({"command": _copy_command(command), "time": _input_clock, "serial": _buffer_serial})
 	command_buffered.emit(command, input_buffer_window)
 	return OK
 
@@ -235,6 +235,19 @@ func _flush_buffered() -> void:
 			_buffered.remove_at(i)
 			_reject(command, "Buffered action became invalid.", result)
 	_flushing = false
+
+func _copy_command(source: MobileInputCommand) -> MobileInputCommand:
+	var copy := MobileInputCommand.new()
+	copy.action = source.action
+	copy.phase = source.phase
+	copy.mode = source.mode
+	copy.vector = source.vector
+	copy.strength = source.strength
+	copy.ability_id = source.ability_id
+	copy.source_id = source.source_id
+	copy.sequence_id = source.sequence_id
+	return copy
+
 
 func _remove_buffered_source(source_id: StringName) -> void:
 	for i in range(_buffered.size() - 1, -1, -1):
