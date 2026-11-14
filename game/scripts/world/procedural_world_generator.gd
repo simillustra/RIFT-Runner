@@ -145,6 +145,12 @@ func clear_generated_segments() -> void:
 	_clear_pool()
 	generation_reset.emit()
 
+## Returns an active generated segment by its stable window index.
+func get_generated_segment(index: int) -> Node3D:
+	if index < 0 or index >= _generated_segments.size():
+		return null
+	return _generated_segments[index]
+
 func get_generated_segment_count() -> int:
 	return _generated_segments.size()
 

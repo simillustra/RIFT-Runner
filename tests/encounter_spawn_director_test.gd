@@ -42,7 +42,7 @@ func _run() -> void:
 	root.add_child(generator)
 	await process_frame
 	_check(generator.generate_initial_segments() == OK, "segment with encounter anchors generates")
-	var segment := generator.get_child(0) as Node3D
+	var segment := generator.get_generated_segment(0)
 	var profile := EncounterPacingProfile.new()
 	var director := EncounterSpawnDirector.new()
 	director.pacing_profile = profile
@@ -53,6 +53,9 @@ func _run() -> void:
 	_check(plan_a.spawn_points.size() == 2, "spawn plan respects budget cost and authored anchor count")
 	_check(plan_a.spawn_points == plan_b.spawn_points, "same inputs produce identical spawn transforms")
 	_check(plan_a.max_concurrent == profile.maximum_concurrent_enemies, "plan carries concurrency cap")
+	generator.queue_free()
+	director.free()
+	await process_frame
 	if failures == 0:
 		print("RR-007 D4 encounter pacing: PASS")
 		quit(0)
