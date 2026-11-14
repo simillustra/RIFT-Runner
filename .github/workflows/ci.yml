@@ -54,6 +54,8 @@ jobs:
         run: godot --headless --path . --script res://tests/procedural_world_generator_test.gd
       - name: Run RR-007 encounter spawn director test suite
         run: godot --headless --path . --script res://tests/encounter_spawn_director_test.gd
+      - name: Run RR-007 runtime streaming and pooling test suite
+        run: godot --headless --path . --script res://tests/world_streaming_pool_test.gd
       - name: Run RR-008 enemy AI controller test suite
         run: godot --headless --path . --script res://tests/enemy_ai_controller_test.gd
       - name: Run RR-008 enemy perception test suite
