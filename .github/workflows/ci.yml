@@ -38,3 +38,5 @@ jobs:
         run: godot --headless --path . --script res://tests/animation_rig_validation_test.gd
       - name: Run RR-005 health component test suite
         run: godot --headless --path . --script res://tests/health_component_test.gd
+      - name: Run RR-005 attack executor test suite
+        run: godot --headless --path . --script res://tests/attack_executor_test.gd
