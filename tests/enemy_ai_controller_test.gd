@@ -4,6 +4,22 @@ var failures: int = 0
 func _initialize() -> void:
 	call_deferred("_run")
 func _run() -> void:
+	var enemy_scene := load("res://game/scenes/combat/enemy_combatant.tscn") as PackedScene
+	_check(enemy_scene != null, "enemy combatant scene loads")
+	if enemy_scene != null:
+		var enemy_scene_instance := enemy_scene.instantiate()
+		root.add_child(enemy_scene_instance)
+		await process_frame
+		_check(enemy_scene_instance.get_node_or_null("EnemyAIController") is EnemyAIController, "enemy scene wires the AI controller")
+		enemy_scene_instance.queue_free()
+	var boss_scene := load("res://game/scenes/combat/boss_combatant.tscn") as PackedScene
+	_check(boss_scene != null, "boss combatant scene loads")
+	if boss_scene != null:
+		var boss_scene_instance := boss_scene.instantiate()
+		root.add_child(boss_scene_instance)
+		await process_frame
+		_check(boss_scene_instance.get_node_or_null("EnemyAIController") is EnemyAIController, "boss scene wires the AI controller")
+		boss_scene_instance.queue_free()
 	var enemy := CharacterBody3D.new()
 	var health := HealthComponent.new()
 	health.name = "HealthComponent"
