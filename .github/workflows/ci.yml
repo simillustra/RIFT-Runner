@@ -48,3 +48,5 @@ jobs:
         run: godot --headless --path . --script res://tests/enemy_boss_combat_test.gd
       - name: Run RR-005 hit reaction and death presentation test suite
         run: godot --headless --path . --script res://tests/combat_reaction_test.gd
+      - name: Run RR-005 deterministic encounter validation suite
+        run: godot --headless --path . --script res://tests/combat_encounter_validation_test.gd
