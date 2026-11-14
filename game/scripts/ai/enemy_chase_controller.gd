@@ -9,6 +9,8 @@ class_name EnemyChaseController
 @export_range(0.1, 20.0, 0.1) var acceleration: float = 12.0
 @export_range(0.1, 30.0, 0.1) var turn_speed: float = 10.0
 @export_range(0.02, 1.0, 0.01) var navigation_repath_seconds: float = 0.2
+@export var engagement_policy: EnemyArchetypeProfile.EngagementPolicy = EnemyArchetypeProfile.EngagementPolicy.PURSUER
+@export_range(0.0, 1.0, 0.05) var strafe_speed_ratio: float = 0.45
 var _actor: CharacterBody3D
 var _ai: EnemyAIController
 var _agent: NavigationAgent3D
@@ -24,10 +26,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	update_steering(delta)
 
-## Public for deterministic tests and controlled simulation.
 func update_steering(delta: float) -> Vector3:
-	if delta <= 0.0 or _actor == null or _ai == null:
-		return Vector3.ZERO
+	if delta <= 0.0 or _actor == null or _ai == null: return Vector3.ZERO
 	if _ai.current_state != EnemyAIController.State.CHASE or not is_instance_valid(_ai.target):
 		_brake(delta)
 		return Vector3.ZERO
@@ -36,8 +36,13 @@ func update_steering(delta: float) -> Vector3:
 	offset.y = 0.0
 	var distance := offset.length()
 	if distance <= preferred_attack_distance + stopping_tolerance:
-		_brake(delta)
 		_face_direction(offset, delta)
+		if engagement_policy == EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER and distance > 0.1:
+			var tangent := Vector3(-offset.z, 0.0, offset.x).normalized()
+			var desired_strafe := tangent * move_speed * strafe_speed_ratio
+			_apply_horizontal_velocity(desired_strafe, delta)
+			return desired_strafe
+		_brake(delta)
 		return Vector3.ZERO
 	_repath_remaining -= delta
 	var direction := Vector3.ZERO
@@ -55,20 +60,19 @@ func update_steering(delta: float) -> Vector3:
 		direction = direction.normalized()
 		_face_direction(direction, delta)
 	var desired := direction * move_speed
+	_apply_horizontal_velocity(desired, delta)
+	return desired
+
+func _apply_horizontal_velocity(desired: Vector3, delta: float) -> void:
 	var horizontal := Vector3(_actor.velocity.x, 0.0, _actor.velocity.z)
 	horizontal = horizontal.move_toward(desired, acceleration * delta)
 	_actor.velocity.x = horizontal.x
 	_actor.velocity.z = horizontal.z
 	_actor.move_and_slide()
-	return desired
 
 func _brake(delta: float) -> void:
 	if _actor == null: return
-	var horizontal := Vector3(_actor.velocity.x, 0.0, _actor.velocity.z)
-	horizontal = horizontal.move_toward(Vector3.ZERO, acceleration * delta)
-	_actor.velocity.x = horizontal.x
-	_actor.velocity.z = horizontal.z
-	_actor.move_and_slide()
+	_apply_horizontal_velocity(Vector3.ZERO, delta)
 
 func _face_direction(direction: Vector3, delta: float) -> void:
 	if direction.length_squared() <= 0.0001: return

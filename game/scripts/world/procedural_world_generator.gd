@@ -79,6 +79,9 @@ func append_next_segment() -> Node3D:
 		segment.global_transform = _last_exit_socket.global_transform * entry_in_root.affine_inverse()
 	segment.set_meta("segment_id", selected.segment_id)
 	segment.set_meta("theme_id", selected.theme_id)
+	## Keep the exact resource on the instance. Socket lookup no longer depends on a
+	## separately reconstructed ID lookup, which could silently return an empty list.
+	segment.set_meta("segment_definition", selected)
 	_generated_segments.append(segment)
 	_generated_segment_ids.append(selected.segment_id)
 	_last_definition = selected
@@ -105,9 +108,20 @@ func get_last_exit_socket() -> Marker3D:
 	return _last_exit_socket
 
 func get_placement_sockets(segment: Node3D, category: StringName) -> Array[Marker3D]:
-	if segment == null or not is_instance_valid(segment): return []
+	var definition := _get_segment_definition(segment)
+	if definition == null: return []
+	return definition.get_placement_sockets(segment, category)
+
+func get_encounter_spawn_sockets(segment: Node3D) -> Array[Marker3D]:
+	var definition := _get_segment_definition(segment)
+	if definition == null: return []
+	return definition.get_encounter_spawn_sockets(segment)
+
+func _get_segment_definition(segment: Node3D) -> WorldSegmentDefinition:
+	if segment == null or not is_instance_valid(segment): return null
+	var definition := segment.get_meta("segment_definition", null) as WorldSegmentDefinition
+	if definition != null: return definition
 	var segment_id: StringName = segment.get_meta("segment_id", &"")
-	for definition: WorldSegmentDefinition in segment_definitions:
-		if definition != null and definition.segment_id == segment_id:
-			return definition.get_placement_sockets(segment, category)
-	return []
+	for candidate: WorldSegmentDefinition in segment_definitions:
+		if candidate != null and candidate.segment_id == segment_id: return candidate
+	return null
