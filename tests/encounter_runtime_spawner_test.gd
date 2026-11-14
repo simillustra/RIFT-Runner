@@ -79,6 +79,7 @@ func _run() -> void:
 		var ai := first_enemy.get_node_or_null("EnemyAIController") as EnemyAIController
 		var applied := first_enemy.get_node_or_null("EnemyArchetypeController") as EnemyArchetypeController
 		_check(ai != null and ai.has_squad_coordinator(), "spawned AI receives encounter squad coordinator")
+		_check(ai != null and ai.assigned_tactical_role == EnemySquadCoordinator.TacticalRole.PURSUER, "spawned AI receives role derived from authored archetype policy")
 		_check(applied != null and applied.profile == archetype, "spawned enemy receives authored archetype profile")
 		var health := first_enemy.get_node_or_null("HealthComponent") as HealthComponent
 		_check(health != null and health.apply_damage(1000.0) > 0.0, "spawned enemy can enter the death state")

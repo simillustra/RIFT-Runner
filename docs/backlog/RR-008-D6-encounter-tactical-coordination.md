@@ -25,7 +25,7 @@ Coordinate complete enemy encounters using deterministic, local Godot decisions.
 - Coordinator cleanup also prunes freed instance IDs before answering counts or reservations.
 
 ## Automated validation
-`tests/encounter_tactical_coordination_d6_test.gd` covers role composition, capacity fallback, distinct and stable approach sectors, attack-slot compatibility, stagger release, low-health retreat, retreat steering, recovery/re-engagement, target invalidation and death cleanup. CI runs it after project import/class registration.
+`tests/encounter_tactical_coordination_d6_test.gd` covers role composition, capacity fallback, distinct and stable approach sectors, attack-slot compatibility, stagger release, low-health retreat, retreat steering, recovery/re-engagement, target invalidation and death cleanup. The RR-007 runtime spawner suite also asserts that an authored archetype policy becomes the spawned AI's encounter role. CI runs both after project import/class registration.
 
 ## Gameplay validation still required
 Automated tests validate deterministic contracts, not tactical quality. Before acceptance, record gameplay captures for:
