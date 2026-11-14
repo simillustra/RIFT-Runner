@@ -2,7 +2,7 @@ extends SceneTree
 ## RR-003 D6 production CharacterActor integration and collision-arena validation.
 
 const PHYSICS_STEPS: int = 180
-const START_POSITION := Vector3(-1.5, 0.95, 0.0)
+const START_POSITION := Vector3(-1.5, 1.25, 0.0)
 const WALL_CENTER_X: float = 2.8
 var failures: int = 0
 
