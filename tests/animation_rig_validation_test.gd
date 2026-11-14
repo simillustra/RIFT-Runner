@@ -14,6 +14,17 @@ const CLIP_NAMES: Array[StringName] = [
 	&"falling",
 	&"landing",
 ]
+# Godot 4.4 does not expose AnimationNodeStateMachine.get_node_list().
+# Keep this contract list aligned with CharacterAnimationGraph's declared states.
+const GRAPH_STATE_NAMES: Array[StringName] = [
+	CharacterAnimationGraph.STATE_IDLE,
+	CharacterAnimationGraph.STATE_MOVE,
+	CharacterAnimationGraph.STATE_JUMP_START,
+	CharacterAnimationGraph.STATE_RISING,
+	CharacterAnimationGraph.STATE_FALLING,
+	CharacterAnimationGraph.STATE_LANDING,
+	CharacterAnimationGraph.STATE_HIT_REACT,
+]
 
 var failures: int = 0
 
@@ -58,7 +69,9 @@ func _run() -> void:
 func _graph_clips_exist(machine: AnimationNodeStateMachine, player: AnimationPlayer) -> bool:
 	if machine == null:
 		return false
-	for state_name: StringName in machine.get_node_list():
+	for state_name: StringName in GRAPH_STATE_NAMES:
+		if not machine.has_node(state_name):
+			return false
 		var node := machine.get_node(state_name)
 		if node is AnimationNodeAnimation:
 			if not player.has_animation((node as AnimationNodeAnimation).animation):
