@@ -6,6 +6,7 @@ class_name CharacterAnimationGraph
 const PLAYBACK_PARAMETER_PATH: StringName = &"parameters/playback"
 const MOVE_BLEND_PARAMETER_PATH: StringName = &"parameters/Move/blend_position"
 
+const START_NODE: StringName = &"Start"
 const STATE_IDLE: StringName = &"Idle"
 const STATE_MOVE: StringName = &"Move"
 const STATE_JUMP_START: StringName = &"JumpStart"
@@ -26,7 +27,6 @@ static func create_state_machine(profile: AnimationProfile) -> AnimationNodeStat
 		return null
 	var machine := AnimationNodeStateMachine.new()
 	machine.resource_name = "Locomotion"
-	machine.start_node = STATE_IDLE
 	machine.add_node(STATE_IDLE, _animation_node(profile.get_clip(&"idle")), Vector2(0.0, 0.0))
 	machine.add_node(STATE_MOVE, _create_move_blend_space(profile), Vector2(240.0, 0.0))
 	machine.add_node(STATE_JUMP_START, _animation_node(profile.get_clip(&"jump_start")), Vector2(0.0, 180.0))
@@ -34,6 +34,7 @@ static func create_state_machine(profile: AnimationProfile) -> AnimationNodeStat
 	machine.add_node(STATE_FALLING, _animation_node(profile.get_clip(&"falling")), Vector2(360.0, 180.0))
 	machine.add_node(STATE_LANDING, _animation_node(profile.get_clip(&"landing")), Vector2(360.0, 360.0))
 	machine.add_node(STATE_HIT_REACT, _animation_node(profile.get_clip(&"hit_react")), Vector2(600.0, 0.0))
+	_add_transition(machine, START_NODE, STATE_IDLE)
 	_add_transition(machine, STATE_IDLE, STATE_MOVE)
 	_add_transition(machine, STATE_MOVE, STATE_IDLE)
 	_add_transition(machine, STATE_IDLE, STATE_JUMP_START)
@@ -58,13 +59,13 @@ static func validate_state_machine(machine: AnimationNodeStateMachine) -> Packed
 	for state_name: StringName in required_nodes:
 		if not machine.has_node(state_name):
 			errors.append("Animation state machine is missing state %s." % String(state_name))
+	if not machine.has_transition(START_NODE, STATE_IDLE):
+		errors.append("Animation state machine must connect Start to Idle.")
 	var move_node := machine.get_node(STATE_MOVE) as AnimationNodeBlendSpace2D
 	if move_node == null:
 		errors.append("Move state must use AnimationNodeBlendSpace2D.")
 	elif move_node.get_blend_point_count() != 5:
 		errors.append("Move BlendSpace2D must define exactly five directional/idle points.")
-	if machine.start_node != STATE_IDLE:
-		errors.append("Animation state machine start node must be Idle.")
 	return errors
 
 static func get_playback(tree: AnimationTree) -> AnimationNodeStateMachinePlayback:
