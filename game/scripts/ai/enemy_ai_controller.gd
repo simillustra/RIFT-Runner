@@ -242,7 +242,7 @@ func _release_attack_slot() -> void:
 
 func _release_tactical_target_claims() -> void:
 	if is_instance_valid(_squad_coordinator):
-		_squad_coordinator.release_target_claim(get_parent() as Node3D)
+		_squad_coordinator.release_member_claims(get_parent() as Node3D)
 	_attack_slot_reserved = false
 
 func _transition_to(next_state: int) -> void:

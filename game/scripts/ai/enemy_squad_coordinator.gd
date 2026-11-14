@@ -292,6 +292,8 @@ func _cleanup_all() -> void:
 		_cleanup_target(int(target_key))
 	for target_key: Variant in _approach_by_target.keys():
 		_cleanup_target(int(target_key))
+	for target_key: Variant in _retreating_by_target.keys():
+		_cleanup_target(int(target_key))
 	for role_key: Variant in _members_by_role.keys():
 		var members: Array = _members_by_role[role_key]
 		for index: int in range(members.size() - 1, -1, -1):
