@@ -49,6 +49,27 @@ func validate_configuration() -> PackedStringArray:
 	return errors
 
 
+## Returns a detached snapshot for animation/presentation consumers.
+## The snapshot is observational: mutating it cannot change movement or actor state.
+func get_animation_state() -> CharacterAnimationState:
+	if _actor == null:
+		return CharacterAnimationState.new(
+			Vector3.ZERO,
+			0.0,
+			is_grounded,
+			movement_mode,
+			Basis.IDENTITY
+		)
+	var planar_velocity := Vector3(_actor.velocity.x, 0.0, _actor.velocity.z)
+	return CharacterAnimationState.new(
+		planar_velocity,
+		_actor.velocity.y,
+		is_grounded,
+		movement_mode,
+		_actor.global_transform.basis
+	)
+
+
 func set_move_intent(intent: Vector2) -> void:
 	_move_intent = intent.limit_length(1.0)
 
