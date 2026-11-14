@@ -8,6 +8,8 @@ enum State { IDLE, ALERT, CHASE, ATTACK, STAGGERED, DEAD }
 @export var health_component_path: NodePath = NodePath("../HealthComponent")
 @export var enemy_combat_controller_path: NodePath = NodePath("../EnemyCombatController")
 @export var combat_reaction_controller_path: NodePath = NodePath("../CombatReactionController")
+@export var attack_executor_path: NodePath = NodePath("../AttackExecutor")
+@export var squad_coordinator_path: NodePath
 @export_range(0.5, 100.0, 0.1) var detection_range: float = 12.0
 @export_range(0.5, 100.0, 0.1) var attack_range: float = 2.0
 @export_range(0.5, 150.0, 0.1) var lose_target_range: float = 18.0
@@ -17,6 +19,9 @@ var target: Node3D
 var _health: HealthComponent
 var _combat: EnemyCombatController
 var _reactions: CombatReactionController
+var _executor: AttackExecutor
+var _squad_coordinator: EnemySquadCoordinator
+var _attack_slot_reserved: bool = false
 var _attack_retry_remaining: float = 0.0
 var _stagger_remaining: float = 0.0
 
@@ -24,6 +29,10 @@ func _ready() -> void:
 	_health = get_node_or_null(health_component_path) as HealthComponent
 	_combat = get_node_or_null(enemy_combat_controller_path) as EnemyCombatController
 	_reactions = get_node_or_null(combat_reaction_controller_path) as CombatReactionController
+	_executor = get_node_or_null(attack_executor_path) as AttackExecutor
+	_squad_coordinator = get_node_or_null(squad_coordinator_path) as EnemySquadCoordinator
+	if _executor != null:
+		_executor.attack_finished.connect(_on_attack_finished)
 	if _reactions != null:
 		_reactions.stagger_started.connect(_on_reaction_stagger_started)
 		_reactions.death_presented.connect(set_dead)
@@ -41,6 +50,7 @@ func set_target(next_target: Node3D) -> void:
 		return
 	if target == next_target:
 		return
+	_release_attack_slot()
 	target = next_target
 	target_changed.emit(target)
 	if current_state == State.IDLE:
@@ -49,6 +59,7 @@ func set_target(next_target: Node3D) -> void:
 func clear_target() -> void:
 	if target == null:
 		return
+	_release_attack_slot()
 	target = null
 	target_changed.emit(null)
 	if current_state != State.DEAD and current_state != State.STAGGERED:
@@ -59,6 +70,9 @@ func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 		return
 	if staggered:
 		_stagger_remaining = maxf(duration_seconds, 0.0)
+		_release_attack_slot()
+		if _executor != null:
+			_executor.cancel_attack()
 		_transition_to(State.STAGGERED)
 	elif current_state == State.STAGGERED:
 		_stagger_remaining = 0.0
@@ -67,6 +81,9 @@ func set_staggered(staggered: bool, duration_seconds: float = 0.0) -> void:
 func set_dead() -> void:
 	if current_state == State.DEAD:
 		return
+	_release_attack_slot()
+	if _executor != null:
+		_executor.cancel_attack()
 	target = null
 	target_changed.emit(null)
 	_transition_to(State.DEAD)
@@ -115,12 +132,28 @@ func _get_target_distance() -> float:
 func _try_request_attack() -> void:
 	if _attack_retry_remaining > 0.0 or _combat == null:
 		return
+	if _squad_coordinator != null and not _attack_slot_reserved:
+		if not _squad_coordinator.request_attack_slot(get_parent() as Node3D, target):
+			_attack_retry_remaining = failed_attack_retry_seconds
+			return
+		_attack_slot_reserved = true
 	var result := _combat.request_attack()
 	if result == OK:
 		attack_requested.emit()
 		_attack_retry_remaining = 0.25
 	else:
+		_release_attack_slot()
 		_attack_retry_remaining = failed_attack_retry_seconds
+
+func _on_attack_finished(_definition: AttackDefinition) -> void:
+	_release_attack_slot()
+
+func _release_attack_slot() -> void:
+	if not _attack_slot_reserved:
+		return
+	if _squad_coordinator != null:
+		_squad_coordinator.release_attack_slot(get_parent() as Node3D)
+	_attack_slot_reserved = false
 
 func _transition_to(next_state: int) -> void:
 	if current_state == next_state:
