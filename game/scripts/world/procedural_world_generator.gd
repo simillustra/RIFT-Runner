@@ -1,6 +1,6 @@
 extends Node3D
 class_name ProceduralWorldGenerator
-## Deterministic, seed-driven linear segment composer. Segments extend along local -Z.
+## Deterministic segment composer. Each new entry socket aligns to the previous exit.
 signal segment_spawned(segment: Node3D, definition: WorldSegmentDefinition)
 signal generation_reset
 @export var segment_definitions: Array[WorldSegmentDefinition] = []
@@ -11,11 +11,11 @@ signal generation_reset
 var _rng := RandomNumberGenerator.new()
 var _generated_segments: Array[Node3D] = []
 var _generated_segment_ids: Array[StringName] = []
-var _next_segment_offset: float = 0.0
+var _last_definition: WorldSegmentDefinition
+var _last_exit_socket: Marker3D
 
 func _ready() -> void:
-	if generate_on_ready:
-		generate_initial_segments()
+	if generate_on_ready: generate_initial_segments()
 
 func set_world_seed(seed_value: int) -> void:
 	world_seed = seed_value
@@ -32,8 +32,7 @@ func validate_configuration() -> PackedStringArray:
 			continue
 		for definition_error: String in definition.validate():
 			errors.append("%s: %s" % [String(definition.segment_id), definition_error])
-		if seen_ids.has(definition.segment_id):
-			errors.append("Duplicate segment_id '%s'." % String(definition.segment_id))
+		if seen_ids.has(definition.segment_id): errors.append("Duplicate segment_id '%s'." % String(definition.segment_id))
 		seen_ids[definition.segment_id] = true
 	return errors
 
@@ -53,10 +52,10 @@ func generate_initial_segments() -> Error:
 func append_next_segment() -> Node3D:
 	var candidates: Array[WorldSegmentDefinition] = []
 	for definition: WorldSegmentDefinition in segment_definitions:
-		if definition != null and definition.validate().is_empty():
+		if definition != null and definition.validate().is_empty() and definition.can_follow(_last_definition):
 			candidates.append(definition)
 	if candidates.is_empty():
-		push_error("ProceduralWorldGenerator has no valid segment definitions.")
+		push_error("No valid segment definition is connector-compatible with the previous segment.")
 		return null
 	var selected: WorldSegmentDefinition = candidates[_rng.randi_range(0, candidates.size() - 1)]
 	var instance: Node = selected.segment_scene.instantiate()
@@ -65,24 +64,35 @@ func append_next_segment() -> Node3D:
 		instance.free()
 		push_error("Segment '%s' root must inherit Node3D." % String(selected.segment_id))
 		return null
+	var entry := segment.get_node_or_null(selected.entry_socket_path) as Marker3D
+	var exit_socket := segment.get_node_or_null(selected.exit_socket_path) as Marker3D
+	if entry == null or exit_socket == null:
+		instance.free()
+		push_error("Segment '%s' is missing its configured Marker3D sockets." % String(selected.segment_id))
+		return null
 	segment.name = StringName("%s_%d" % [String(selected.segment_id), _generated_segments.size()])
 	add_child(segment)
-	segment.position = start_position + Vector3(0.0, 0.0, -_next_segment_offset)
+	if _last_exit_socket == null:
+		segment.global_transform = global_transform * Transform3D(Basis.IDENTITY, start_position)
+	else:
+		var entry_in_root := segment.global_transform.affine_inverse() * entry.global_transform
+		segment.global_transform = _last_exit_socket.global_transform * entry_in_root.affine_inverse()
 	segment.set_meta("segment_id", selected.segment_id)
 	segment.set_meta("theme_id", selected.theme_id)
 	_generated_segments.append(segment)
 	_generated_segment_ids.append(selected.segment_id)
-	_next_segment_offset += selected.segment_length
+	_last_definition = selected
+	_last_exit_socket = exit_socket
 	segment_spawned.emit(segment, selected)
 	return segment
 
 func clear_generated_segments() -> void:
 	for segment: Node3D in _generated_segments:
-		if is_instance_valid(segment):
-			segment.queue_free()
+		if is_instance_valid(segment): segment.queue_free()
 	_generated_segments.clear()
 	_generated_segment_ids.clear()
-	_next_segment_offset = 0.0
+	_last_definition = null
+	_last_exit_socket = null
 	generation_reset.emit()
 
 func get_generated_segment_count() -> int:
@@ -90,3 +100,6 @@ func get_generated_segment_count() -> int:
 
 func get_generated_segment_ids() -> Array[StringName]:
 	return _generated_segment_ids.duplicate()
+
+func get_last_exit_socket() -> Marker3D:
+	return _last_exit_socket
