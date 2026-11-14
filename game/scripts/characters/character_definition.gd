@@ -9,6 +9,8 @@ class_name CharacterDefinition
 @export var stats: CharacterStats
 @export var basic_attack: AttackDefinition
 @export var abilities: Array[AbilityDefinition] = []
+@export var primary_ability_id: StringName = &""
+@export var secondary_ability_id: StringName = &""
 
 
 func validate() -> PackedStringArray:
@@ -36,4 +38,29 @@ func validate() -> PackedStringArray:
 		if seen_ability_ids.has(ability.ability_id):
 			errors.append("Duplicate ability_id: %s" % String(ability.ability_id))
 		seen_ability_ids[ability.ability_id] = true
+
+	if primary_ability_id != &"" and not seen_ability_ids.has(primary_ability_id):
+		errors.append("primary_ability_id must reference an ability owned by this hero.")
+	if secondary_ability_id != &"" and not seen_ability_ids.has(secondary_ability_id):
+		errors.append("secondary_ability_id must reference an ability owned by this hero.")
+	if primary_ability_id != &"" and primary_ability_id == secondary_ability_id:
+		errors.append("Primary and secondary ability slots must reference different abilities.")
 	return errors
+
+
+func get_ability_id_for_slot(action: int) -> StringName:
+	match action:
+		MobileInputAction.Action.ABILITY_PRIMARY:
+			return primary_ability_id
+		MobileInputAction.Action.ABILITY_SECONDARY:
+			return secondary_ability_id
+	return &""
+
+
+func owns_ability(ability_id: StringName) -> bool:
+	if ability_id == &"":
+		return false
+	for ability: AbilityDefinition in abilities:
+		if ability != null and ability.ability_id == ability_id:
+			return true
+	return false
