@@ -9,7 +9,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
 | RR-004 | Animation Framework | P0 | D1-D6 and D7 automated baseline merged; visual/device sign-off open |
 | RR-005 | Combat System | P0 | D1-D7 merged; device and encounter sign-off open |
-| RR-006 | Mobile Input | P0 | D1 merged; D2 virtual joystick implementation |
+| RR-006 | Mobile Input | P0 | D1 contract; D2 guided joystick and D3 free-hand swipe/drag implementation |
 | RR-007 | Procedural World | P0 | D1-D4 and D5.1 runtime streaming/pooling merged; D5.3 runtime enemy spawning in implementation |
 | RR-008 | Enemy AI | P0 | D1-D5 foundations merged; D6 tactical coordination in implementation |
 | RR-009 | Progression and Rewards | P0 | Not started |

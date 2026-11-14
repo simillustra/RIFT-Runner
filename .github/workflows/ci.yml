@@ -40,6 +40,8 @@ jobs:
         run: godot --headless --path . --script res://tests/mobile_input_contract_test.gd
       - name: Run RR-006 virtual joystick test suite
         run: godot --headless --path . --script res://tests/virtual_joystick_test.gd
+      - name: Run RR-006 free-hand gesture recognizer test suite
+        run: godot --headless --path . --script res://tests/free_hand_gesture_recognizer_test.gd
       - name: Run RR-005 health component test suite
         run: godot --headless --path . --script res://tests/health_component_test.gd
       - name: Run RR-005 attack executor test suite
