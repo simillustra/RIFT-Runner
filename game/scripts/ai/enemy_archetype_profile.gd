@@ -11,6 +11,7 @@ enum EngagementPolicy { PURSUER, SKIRMISHER, RANGED }
 @export_range(0.1, 20.0, 0.1) var acceleration: float = 12.0
 @export_range(0.1, 30.0, 0.1) var turn_speed: float = 10.0
 @export var engagement_policy: EngagementPolicy = EngagementPolicy.PURSUER
+@export var can_retreat: bool = true
 
 func validate() -> PackedStringArray:
 	var errors := PackedStringArray()

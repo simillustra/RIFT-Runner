@@ -24,11 +24,13 @@ func _run() -> void:
 	profile.move_speed = 5.5
 	profile.preferred_attack_distance = 2.8
 	profile.engagement_policy = EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER
+	profile.can_retreat = false
 	_check(archetype.apply_profile(profile) == OK, "valid archetype profile applies")
 	_check(is_equal_approx(ai.detection_range, 22.0), "profile configures perception range")
 	_check(is_equal_approx(ai.attack_range, 3.0), "profile configures attack range")
 	_check(is_equal_approx(chase.move_speed, 5.5), "profile configures chase speed")
 	_check(chase.engagement_policy == EnemyArchetypeProfile.EngagementPolicy.SKIRMISHER, "profile configures engagement policy")
+	_check(not ai.retreat_enabled, "archetype profile can disable retreat for committed enemies")
 	var invalid := EnemyArchetypeProfile.new()
 	invalid.archetype_id = &"invalid"
 	invalid.attack_range = 40.0

@@ -16,7 +16,7 @@ Coordinate complete enemy encounters using deterministic, local Godot decisions.
 - RANGED prefers a rear standoff sector and uses its authored preferred distance. Projectile/ranged attack execution remains a separate combat capability and is not implied by this positioning milestone.
 - Occupied sectors are skipped. Each member keeps its sector while the target remains unchanged; target changes release the previous claim.
 - Attack slots remain separately capped per target.
-- A low-health enemy may retreat once per encounter. It moves directly away until it reaches `retreat_distance`, reports disengagement, waits a deterministic recovery interval, then re-enters CHASE. Death remains terminal.
+- Retreat eligibility is authored per archetype through `EnemyArchetypeProfile.can_retreat`; suitable units may retreat once per encounter. It moves directly away until it reaches `retreat_distance`, reports disengagement, waits a deterministic recovery interval, then re-enters CHASE. Death remains terminal.
 
 ## Determinism and safety
 - No network, LLM, remote AI or asynchronous service is called by perception, tactical decisions, movement or combat.
