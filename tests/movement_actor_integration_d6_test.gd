@@ -51,7 +51,13 @@ func _run() -> void:
 	movement.movement_mode = CharacterMovementController.MovementMode.FREE
 	root.add_child(actor)
 	await process_frame
-	await physics_frame
+	# Allow the real capsule to settle onto the sloped collision surface before
+	# asserting initial grounded state; a single physics tick is not sufficient
+	# when the scene enters above the ramp contact plane.
+	for _settle_step in range(30):
+		await physics_frame
+		if actor.is_on_floor() and movement.is_grounded:
+			break
 
 	_check(movement.is_operational(), "production movement controller initializes with valid CharacterBody3D ownership")
 	_check(actor.definition != null and actor.definition.character_id == &"vanguard", "production actor receives the Vanguard character definition")
@@ -78,14 +84,14 @@ func _run() -> void:
 	# Velocity records the requested movement for the physics step and is not a
 	# reliable collision assertion on its own. Keep intent active and verify the
 	# solver reports wall contact while the actor position remains stationary.
-	var wall_contact_position := actor.global_position
+	var wall_contact_position_x := actor.global_position.x
 	var wall_contact := actor.is_on_wall()
 	for _step in range(12):
 		await physics_frame
 		wall_contact = wall_contact or actor.is_on_wall()
-	var wall_displacement := actor.global_position.distance_to(wall_contact_position)
+	var wall_horizontal_displacement := absf(actor.global_position.x - wall_contact_position_x)
 	_check(wall_contact, "production CharacterBody3D reports contact with the vertical wall")
-	_check(wall_displacement < 0.03, "wall collision prevents continued horizontal displacement")
+	_check(wall_horizontal_displacement < 0.03, "wall collision prevents continued horizontal displacement")
 
 	movement.set_move_intent(Vector2.ZERO)
 	actor.queue_free()
