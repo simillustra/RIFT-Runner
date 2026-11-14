@@ -25,6 +25,7 @@ func apply_profile(next_profile: EnemyArchetypeProfile) -> Error:
 	_ai.detection_range = profile.detection_range
 	_ai.attack_range = profile.attack_range
 	_ai.lose_target_range = profile.lose_target_range
+	_ai.retreat_enabled = profile.can_retreat
 	_chase.move_speed = profile.move_speed
 	_chase.preferred_attack_distance = profile.preferred_attack_distance
 	_chase.acceleration = profile.acceleration
