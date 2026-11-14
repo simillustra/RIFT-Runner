@@ -47,7 +47,7 @@ func _test_deadzone_and_normalization(joystick: VirtualJoystick) -> void:
 	joystick.begin_pointer(1, Vector2(80.0, 80.0))
 	joystick.update_pointer(1, Vector2(84.0, 80.0))
 	_assert(joystick.get_output_vector().is_zero_approx(), "deadzone suppresses small accidental movement")
-	joystick.update_pointer(1, Vector2(120.0, 80.0))
+	joystick.update_pointer(1, Vector2(144.0, 80.0))
 	_assert(is_equal_approx(joystick.get_output_vector().length(), 1.0), "full-radius input produces unit magnitude")
 	joystick.end_pointer(1)
 
