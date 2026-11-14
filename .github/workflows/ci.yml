@@ -30,6 +30,8 @@ jobs:
         run: godot --headless --path . --script res://tests/movement_jump_physics_test.gd
       - name: Run RR-003 lane physics test suite
         run: godot --headless --path . --script res://tests/movement_lane_physics_test.gd
+      - name: Run RR-003 free movement physics test suite
+        run: godot --headless --path . --script res://tests/movement_free_physics_test.gd
       - name: Run animation profile test suite
         run: godot --headless --path . --script res://tests/animation_profile_test.gd
       - name: Run animation tree graph test suite
