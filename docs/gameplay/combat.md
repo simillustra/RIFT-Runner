@@ -1,7 +1,7 @@
 # Combat Design
 
 **Owner:** RR-005  
-**Status:** D1-D4 merged; D5 enemy and boss interfaces in review.
+**Status:** D1-D4 merged; D5 CI passed and is in review; D6 hit-reaction implementation in review.
 
 ## Combat principles
 
@@ -15,38 +15,33 @@
 
 ### Health and damage reception (D1)
 
-`HealthComponent` owns maximum/current health, flat defense, optional invulnerability, healing and death. It exposes `apply_damage`, `heal`, `reset_health` and health ratio. Damage is mitigated by flat defense with a one-point minimum for positive hits, capped at remaining health. D5 adds a non-negative damage-intake multiplier after defense; the default is 1.0 and zero is immunity.
+`HealthComponent` owns maximum/current health, flat defense, optional invulnerability, healing and death. It exposes `apply_damage`, `heal`, `reset_health` and health ratio. Damage is mitigated by flat defense, then the D5 damage-intake multiplier is applied.
 
 ### Attack definition and execution (D2)
 
-`AttackDefinition` describes damage type/amount and startup, active, recovery and cooldown durations. `AttackExecutor` enforces:
-
-`IDLE → STARTUP → ACTIVE → RECOVERY → COOLDOWN → IDLE`
-
-Hits are accepted only during ACTIVE; each target can be registered once per attack instance.
+`AttackDefinition` describes damage type/amount and startup, active, recovery and cooldown durations. `AttackExecutor` enforces `IDLE → STARTUP → ACTIVE → RECOVERY → COOLDOWN → IDLE`; hits are accepted only during ACTIVE and each target can be registered once per attack.
 
 ### Collision and target filtering (D3)
 
-- `CombatHitbox` is an Area3D adapter enabled only by D2 active-window signals.
-- `CombatHurtbox` is an Area3D receiver marker resolving a living D1 HealthComponent.
-- Self and explicitly same-team targets are filtered before submission.
-- Eligible overlap events call `AttackExecutor.try_hit()`; D3 never applies damage directly.
-- Disabled, dead and missing-health targets are not submitted.
+`CombatHitbox` is enabled only by D2 active-window signals. `CombatHurtbox` resolves a living D1 HealthComponent. Self and same-team targets are filtered before submission. D3 never applies damage directly.
 
 ### Hero combat (D4)
 
-Vanguard, Phantom and Cipher define their own basic attacks and signature ability metadata. `HeroCombatController` delegates attacks to D2 and exposes ability lifecycle signals.
+Vanguard, Phantom and Cipher define basic attacks and signature ability metadata. `HeroCombatController` delegates attacks to D2 and exposes ability lifecycle signals.
 
 ### Enemy combat and boss damage (D5)
 
-- `EnemyCombatController.request_attack()` validates enemy state and attack data, then delegates to D2 `AttackExecutor`.
-- Reusable enemy and boss combatant scenes compose health, executor, controller, hitbox and hurtbox.
-- `BossDamageController` provides ARMORED, EXPOSED, ENRAGED and DEFEATED phases. It changes D1's damage-intake multiplier and listens to D1 death; it never applies damage itself.
-- Enemy target selection and boss phase scheduling are owned by later enemy AI/encounter work, not this interface.
+`EnemyCombatController` delegates enemy attacks to D2. Boss phases modify D1 damage intake; boss death is driven by D1. Enemy/boss combatant scenes reuse the same D1-D3 contracts.
+
+### Hit reactions and death presentation (D6)
+
+- `CombatReactionController` subscribes to accepted D1 damage/death events.
+- Hit reaction requests the existing RR-004 HitReact animation state when a rig is available.
+- Directional knockback derives from the damage source. CharacterMovementController owns player stagger and impulse integration; CharacterBody3D fallback supports enemies/bosses without that movement controller.
+- Stagger temporarily suppresses movement intent while gravity and collision movement continue.
+- D1 death marks movement dead, cancels D2 attacks, disables collision shapes and disables D3 hurtboxes. A death presentation signal is emitted for future visual/audio assets.
+- D6 does not apply damage, choose targets or implement enemy AI.
 
 ## Planned
 
-- D6: hit reactions, knockback/stagger/death presentation.
 - D7: combat tuning, mobile performance and end-to-end encounter validation.
-
-Weapon sets, combos, dodge windows, stamina/poise and final damage balancing remain to be designed in their respective milestones.
