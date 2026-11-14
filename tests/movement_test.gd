@@ -1,5 +1,5 @@
 extends SceneTree
-## RR-003 movement configuration and intent smoke tests.
+## RR-003 regression and RR-004 D1 movement snapshot contract tests.
 
 var failures: int = 0
 
@@ -19,6 +19,9 @@ func _run() -> void:
 	if actor == null:
 		quit(1)
 		return
+	actor.process_mode = Node.PROCESS_MODE_DISABLED
+	root.add_child(actor)
+	await process_frame
 	var controller := actor.get_node_or_null("MovementController") as CharacterMovementController
 	_check(controller != null, "movement controller is attached")
 	if controller != null:
@@ -34,12 +37,30 @@ func _run() -> void:
 		_check(is_equal_approx(controller._move_intent.length(), 1.0), "movement intent is normalized")
 		controller.request_jump()
 		_check(controller._jump_requested, "jump request is queued")
-	actor.free()
+
+		actor.velocity = Vector3(3.0, 4.5, -6.0)
+		actor.rotation.y = PI / 2.0
+		var snapshot := controller.get_animation_state()
+		_check(snapshot is CharacterAnimationState, "animation snapshot has the typed state contract")
+		_check(snapshot.planar_velocity.is_equal_approx(Vector3(3.0, 0.0, -6.0)), "snapshot exposes planar velocity without vertical component")
+		_check(is_equal_approx(snapshot.vertical_velocity, 4.5), "snapshot exposes vertical velocity")
+		_check(snapshot.is_grounded == controller.is_grounded, "snapshot exposes grounded state")
+		_check(snapshot.movement_mode == CharacterMovementController.MovementMode.LANE, "snapshot exposes movement mode")
+		_check(snapshot.facing_basis.is_equal_approx(actor.global_transform.basis), "snapshot exposes actor facing basis")
+
+		snapshot.planar_velocity = Vector3.ZERO
+		snapshot.vertical_velocity = 0.0
+		var second_snapshot := controller.get_animation_state()
+		_check(second_snapshot.planar_velocity.is_equal_approx(Vector3(3.0, 0.0, -6.0)), "snapshot is detached from actor movement")
+		_check(is_equal_approx(actor.velocity.y, 4.5), "snapshot mutation cannot change actor velocity")
+
+	actor.queue_free()
+	await process_frame
 	if failures == 0:
-		print("RR-003 movement tests: PASS")
+		print("RR-003/RR-004 D1 movement state tests: PASS")
 		quit(0)
 	else:
-		push_error("RR-003 movement tests: %d failure(s)" % failures)
+		push_error("RR-003/RR-004 D1 movement state tests: %d failure(s)" % failures)
 		quit(1)
 
 
