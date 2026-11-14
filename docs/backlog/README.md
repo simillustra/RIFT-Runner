@@ -1,6 +1,6 @@
 # Backlog
 
-RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning is in implementation. RR-008 D1-D4 and D5 per-target attack-slot arbitration are merged; tactical retreat and broader group coordination remain open.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance checks remain open. RR-004 D1-D6 and D7 automated asset-contract validation are merged; production rig, visual and device evidence remains outstanding. RR-005 D1-D7 deterministic encounter regression are merged; Android/iOS device profiling and encounter sign-off remain open. RR-007 D1-D4 and D5.1 runtime streaming/pooling are merged; D5.3 runtime enemy spawning is in implementation and D5.4 integration/performance validation is in implementation. RR-008 D1-D4 and D5.2 retreat, stagger and group coordination are merged.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
@@ -10,8 +10,8 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-004 | Animation Framework | P0 | D1-D6 and D7 automated baseline merged; visual/device sign-off open |
 | RR-005 | Combat System | P0 | D1-D7 merged; device and encounter sign-off open |
 | RR-006 | Mobile Input | P0 | Not started |
-| RR-007 | Procedural World | P0 | D1-D4 and D5.1 runtime streaming/pooling merged; D5.3 runtime enemy spawning in implementation |
-| RR-008 | Enemy AI | P0 | D1-D4 and D5 per-target attack-slot arbitration merged; retreat/tactical group coordination open |
+| RR-007 | Procedural World | P0 | D1-D4 and D5.1 merged; D5.3 in implementation; D5.4 integration/performance validation in implementation |
+| RR-008 | Enemy AI | P0 | D1-D4 and D5.2 stagger, retreat and group coordination merged |
 | RR-009 | Progression and Rewards | P0 | Not started |
 | RR-010 | UI/UX and HUD | P0 | Not started |
 | RR-011 | Audio and VFX | P0 | Not started |
@@ -22,7 +22,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-016 | Fictional Geographic Inspiration | P0 | Not started |
 | RR-017 | Localization | P1 | Not started |
 | RR-018 | In-App Purchases | P1 | Not started |
-| RR-019 | QA and Performance | P0 | Not started |
+| RR-019 | QA and Performance | P0 | D5.4 CI diagnostics added; mobile device profiling open |
 | RR-020 | CI/CD and Release Pipeline | P0 | Not started |
 
 Priorities are planning labels, not permission to bypass dependencies. Every workstream must satisfy its own acceptance criteria before dependent work begins.
