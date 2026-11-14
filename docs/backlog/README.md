@@ -7,7 +7,7 @@ RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; form
 | RR-001 | Project Foundation | P0 | Accepted / merged |
 | RR-002 | Character Framework | P0 | Accepted / merged |
 | RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
-| RR-004 | Animation Framework | P0 | Specified; blocked pending RR-003 acceptance |
+| RR-004 | Animation Framework | P0 | D1-D4 implemented; D5 integration in progress |
 | RR-005 | Combat System | P0 | Not started |
 | RR-006 | Mobile Input | P0 | Not started |
 | RR-007 | Procedural World | P0 | Not started |
