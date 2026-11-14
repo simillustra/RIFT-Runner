@@ -1,13 +1,13 @@
 # Backlog
 
-RR-001 and RR-002 have been merged. RR-002 CI validation follow-up is tracked in the current documentation/CI maintenance PR. RR-003 remains blocked until the character-framework smoke test passes on the corrected workflow.
+RR-001 and RR-002 are accepted and merged. RR-003 implementation is merged; formal acceptance evidence is tracked separately. RR-004 is specified and may begin after RR-003's formal acceptance gate is satisfied.
 
 | ID | Workstream | Priority | Status |
 |---|---|---|---|
 | RR-001 | Project Foundation | P0 | Accepted / merged |
-| RR-002 | Character Framework | P0 | Merged; CI follow-up open |
-| RR-003 | Movement Engine | P0 | Blocked |
-| RR-004 | Animation Framework | P0 | Not started |
+| RR-002 | Character Framework | P0 | Accepted / merged |
+| RR-003 | Movement Engine | P0 | Merged; formal acceptance checks open |
+| RR-004 | Animation Framework | P0 | Specified; blocked pending RR-003 acceptance |
 | RR-005 | Combat System | P0 | Not started |
 | RR-006 | Mobile Input | P0 | Not started |
 | RR-007 | Procedural World | P0 | Not started |
@@ -25,4 +25,4 @@ RR-001 and RR-002 have been merged. RR-002 CI validation follow-up is tracked in
 | RR-019 | QA and Performance | P0 | Not started |
 | RR-020 | CI/CD and Release Pipeline | P0 | Not started |
 
-Priorities are planning labels, not permission to bypass dependencies. Every task must satisfy its own acceptance criteria before dependent work begins.
+Priorities are planning labels, not permission to bypass dependencies. Every workstream must satisfy its own acceptance criteria before dependent work begins.
